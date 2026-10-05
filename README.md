@@ -7,12 +7,12 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Feature | State |
 | --- | --- |
 | Plugin skeleton, config, startup logging | Done |
-| Clarity toggle (remove edge blur and darkening) | Not implemented yet |
-| FPS unlock | Not implemented yet |
+| Clarity toggle (remove edge blur and darkening) | Implemented, awaiting in-game test |
+| FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
 | Easier harpoon struggle | Implemented, awaiting in-game test |
-| Perfect pour tip buff | Not implemented yet |
+| Perfect pour tip buff | Not implemented yet. A log-only probe gathers the data first |
 
-Until a feature is marked Done, its config entries exist but change nothing in the game.
+Nothing here has been confirmed in game yet.
 
 Developed against game build 25315876 (Unity 6000.0.52f1) and BepInEx 6.0.0-be.788.
 
@@ -54,13 +54,23 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 
 | Section | Key | Default | Description |
 | --- | --- | --- | --- |
-| Clarity | Enabled | true | Master toggle: remove the blur and darkening at the screen edges. Per-effect toggles will be added once the game's effects are identified. |
+| Clarity | Enabled | true | Master toggle: remove the blur and darkening at the screen edges. |
+| Clarity | DisableVignette | true | Darkened screen edges. |
+| Clarity | DisableVerticalBlur | true | The game's own blur bands at the top and bottom of the screen. |
+| Clarity | DisableDepthOfField | true | Depth of field blur. |
+| Clarity | DisableChromaticAberration | true | Colour fringing towards the screen edges. |
+| Clarity | DisableLensDistortion | false | Lens warping. |
 | FPS | Enabled | true | Allow the mod to change the frame cap. |
-| FPS | TargetFPS | 0 | Frame cap. 0 = vanilla, frame rate settings untouched. Range 0 to 360. |
+| FPS | TargetFPS | 0 | Frame cap. 0 = vanilla, frame rate settings untouched. Any other value also turns VSync off. Range 0 to 360. |
 | HarpoonStruggle | Enabled | true | Multiply the progress each stick rock / button mash gives. Never auto-completes. |
 | HarpoonStruggle | StruggleMultiplier | 1.5 | Progress multiplier per input. 1.0 = vanilla. Range 1 to 3. |
 | PerfectPourTip | Enabled | true | Slightly raise tip chance after a perfect green tea or beer pour. |
 | PerfectPourTip | PerfectPourTipMultiplier | 1.15 | Tip chance multiplier, clamped to the game's maximum. 1.0 = vanilla. Range 1 to 2. |
+| Debug | TipProbe | true | Temporary. Logs sushi bar drink, payment and tip chance calls. Changes nothing in the game. |
+
+### FPS warning
+
+The game is built around 60 FPS. The existing Nexus mod "FPS Unlocker - In the Jungle Compatible" ships an optional "movement compensation above 60 FPS" patch, which indicates that at least player movement is tied to frame rate. This plugin does not compensate for that. With `TargetFPS` above 60, expect movement and possibly some mini-games or timers to run faster. Leave it at 0 if anything feels off.
 
 ## Checking that it loaded
 

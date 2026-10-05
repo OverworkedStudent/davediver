@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BepInEx.Configuration;
 
 namespace VanillaPlus;
@@ -15,10 +16,26 @@ internal static class ModConfig
     public static ConfigEntry<bool> PerfectPourTipEnabled;
     public static ConfigEntry<float> PerfectPourTipMultiplier;
 
+    public static ConfigEntry<bool> TipProbe;
+
+    private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
+
+    // Unknown effect types (colour grading, bloom, ...) are never touched.
+    public static bool ClarityShouldDisable(string effectTypeName) =>
+        clarityEffects.TryGetValue(effectTypeName, out var entry) && entry.Value;
+
     public static void Bind(ConfigFile cfg)
     {
         ClarityEnabled = cfg.Bind("Clarity", "Enabled", true,
-            "Master toggle: remove the blur and darkening at the screen edges.");
+            "Master toggle: remove the blur and darkening at the screen edges. The per-effect toggles below only apply while this is on.");
+        BindClarityEffect(cfg, "Vignette", true, "Darkened screen edges.");
+        BindClarityEffect(cfg, "VerticalBlur", true, "The game's own blur bands at the top and bottom of the screen.");
+        BindClarityEffect(cfg, "DepthOfField", true, "Depth of field blur.");
+        BindClarityEffect(cfg, "ChromaticAberration", true, "Colour fringing towards the screen edges.");
+        BindClarityEffect(cfg, "LensDistortion", false, "Lens warping. Off by default because it is not a blur or darkening effect.");
+
+        TipProbe = cfg.Bind("Debug", "TipProbe", true,
+            "Temporary. Logs sushi bar drink, payment and tip chance calls to LogOutput.log. Changes nothing in the game.");
 
         FpsEnabled = cfg.Bind("FPS", "Enabled", true,
             "Allow this mod to change the frame cap. Has no effect while TargetFPS is 0.");
@@ -37,5 +54,17 @@ internal static class ModConfig
         PerfectPourTipMultiplier = cfg.Bind("PerfectPourTip", "PerfectPourTipMultiplier", 1.15f,
             new ConfigDescription("Tip chance multiplier on a perfect pour, clamped to the game's maximum. 1.0 = vanilla.",
                 new AcceptableValueRange<float>(1f, 2f)));
+    }
+
+    private static void BindClarityEffect(ConfigFile cfg, string effectTypeName, bool defaultValue, string description)
+    {
+        clarityEffects[effectTypeName] = cfg.Bind("Clarity", "Disable" + effectTypeName, defaultValue, description);
+    }
+
+    public static string ClaritySummary()
+    {
+        var parts = new List<string>();
+        foreach (var pair in clarityEffects) parts.Add($"{pair.Key}={(pair.Value.Value ? "off" : "vanilla")}");
+        return string.Join(", ", parts);
     }
 }

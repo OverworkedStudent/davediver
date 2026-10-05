@@ -27,17 +27,25 @@ public class Plugin : BasePlugin
         Logger.LogInfo($"{Name} {Version} loading");
         Logger.LogInfo($"Game version: {Safe(() => Application.version)} (Unity {Safe(() => Application.unityVersion)})");
 
-        LogFeature("Clarity", ModConfig.ClarityEnabled.Value, null);
+        LogFeature("Clarity", ModConfig.ClarityEnabled.Value, ModConfig.ClaritySummary());
         LogFeature("FPS unlock", ModConfig.FpsEnabled.Value && ModConfig.TargetFPS.Value > 0,
             $"TargetFPS={ModConfig.TargetFPS.Value}");
         LogFeature("Harpoon struggle", ModConfig.StruggleEnabled.Value,
             $"StruggleMultiplier={ModConfig.StruggleMultiplier.Value:0.##}");
-        LogFeature("Perfect pour tip", ModConfig.PerfectPourTipEnabled.Value,
-            $"PerfectPourTipMultiplier={ModConfig.PerfectPourTipMultiplier.Value:0.##}");
+        LogFeature("Perfect pour tip", false,
+            $"not implemented yet; config Enabled={ModConfig.PerfectPourTipEnabled.Value}, PerfectPourTipMultiplier={ModConfig.PerfectPourTipMultiplier.Value:0.##}");
+        LogFeature("Tip probe (debug, log only)", ModConfig.TipProbe.Value, null);
 
         // Feature patch classes live in Features/ and are applied here, one PatchAll per enabled feature.
+        if (ModConfig.ClarityEnabled.Value)
+            Apply("Clarity", typeof(Features.ClarityPatch));
+        if (ModConfig.FpsEnabled.Value && ModConfig.TargetFPS.Value > 0)
+            Apply("FPS unlock", typeof(Features.FpsUnlockPatch));
         if (ModConfig.StruggleEnabled.Value && ModConfig.StruggleMultiplier.Value > 1f)
             Apply("Harpoon struggle", typeof(Features.HarpoonStrugglePatch));
+        // The perfect pour tip buff itself is not written yet; the probe only gathers the data it needs.
+        if (ModConfig.TipProbe.Value)
+            Apply("Tip probe (log only)", typeof(Features.TipProbePatch));
     }
 
     private static void Apply(string feature, Type patchClass)
