@@ -36,7 +36,21 @@ public class Plugin : BasePlugin
             $"PerfectPourTipMultiplier={ModConfig.PerfectPourTipMultiplier.Value:0.##}");
 
         // Feature patch classes live in Features/ and are applied here, one PatchAll per enabled feature.
-        // None are implemented yet: see README "Status".
+        if (ModConfig.StruggleEnabled.Value && ModConfig.StruggleMultiplier.Value > 1f)
+            Apply("Harpoon struggle", typeof(Features.HarpoonStrugglePatch));
+    }
+
+    private static void Apply(string feature, Type patchClass)
+    {
+        try
+        {
+            Harmony.PatchAll(patchClass);
+            Logger.LogInfo($"Patched: {feature}");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Failed to patch {feature}, feature disabled: {e}");
+        }
     }
 
     private static void LogFeature(string feature, bool on, string detail)
