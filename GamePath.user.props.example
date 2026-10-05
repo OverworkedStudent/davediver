@@ -1,0 +1,8 @@
+<!-- Copy to GamePath.user.props (gitignored) and point GamePath at your Dave the Diver install. -->
+<Project>
+  <PropertyGroup>
+    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Dave the Diver</GamePath>
+    <!-- Set to true to copy VanillaPlus.dll into BepInEx\plugins after each build. -->
+    <DeployToGame>false</DeployToGame>
+  </PropertyGroup>
+</Project>

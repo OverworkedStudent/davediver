@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\GamePath.user.props" Condition="Exists('..\..\GamePath.user.props')" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <AssemblyName>VanillaPlus</AssemblyName>
+    <RootNamespace>VanillaPlus</RootNamespace>
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <!-- Game files are never copied into the repo; they are referenced in place from the local install. -->
+  <PropertyGroup>
+    <GamePath Condition="'$(GamePath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Dave the Diver</GamePath>
+    <InteropPath>$(GamePath)\BepInEx\interop</InteropPath>
+    <DeployToGame Condition="'$(DeployToGame)' == ''">false</DeployToGame>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(InteropPath)\*.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="CheckInterop" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(InteropPath)\UnityEngine.CoreModule.dll')"
+           Text="Interop assemblies not found in '$(InteropPath)'. Install BepInEx 6 BE (Unity.IL2CPP-win-x64), launch the game once, and set GamePath in GamePath.user.props (see GamePath.user.props.example)." />
+  </Target>
+
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GamePath)\BepInEx\plugins\VanillaPlus" />
+    <Message Importance="high" Text="Deployed $(TargetFileName) to $(GamePath)\BepInEx\plugins\VanillaPlus" />
+  </Target>
+
+</Project>

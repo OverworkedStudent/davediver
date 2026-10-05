@@ -1,0 +1,34 @@
+# Build output
+bin/
+obj/
+*.user
+.vs/
+.idea/
+*.swp
+
+# Local game path override (machine-specific)
+GamePath.user.props
+
+# Never commit game files or anything generated from them
+GameAssembly.dll
+UnityPlayer.dll
+global-metadata.dat
+Assembly-CSharp*.dll
+Il2Cpp*.dll
+UnityEngine*.dll
+Unity.*.dll
+interop/
+unhollowed/
+dummy/
+lib/
+BepInEx/
+DaveTheDiver_Data/
+*.assets
+*.resS
+*.bundle
+
+# Logs and saves pasted in for debugging
+LogOutput.log
+*.log
+*.sav
+SteamSData/
