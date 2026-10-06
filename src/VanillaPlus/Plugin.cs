@@ -21,6 +21,7 @@ public class Plugin : BasePlugin
     public override void Load()
     {
         Logger = Log;
+        SessionLog.Start(Log);
         ModConfig.Bind(Config);
         Harmony = new Harmony(Guid);
 

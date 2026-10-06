@@ -32,3 +32,6 @@ LogOutput.log
 *.log
 *.sav
 SteamSData/
+
+# Per-session plugin logs
+VanillaPlus-logs/
