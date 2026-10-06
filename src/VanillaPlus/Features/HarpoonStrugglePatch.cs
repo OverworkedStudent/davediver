@@ -21,6 +21,7 @@ internal static class HarpoonStrugglePatch
     [HarmonyPostfix]
     private static void OnEnablePostfix(StickRLQTE __instance)
     {
+        if (!Il2CppGuard.Is<StickRLQTE>(__instance)) return;
         setupLogs = 0;
         largestJump = 0f;
         jumps = 0;
@@ -29,11 +30,19 @@ internal static class HarpoonStrugglePatch
 
     [HarmonyPatch(nameof(StickRLQTE.SetLevel))]
     [HarmonyPostfix]
-    private static void SetLevelPostfix(StickRLQTE __instance) => Begin(__instance, "SetLevel");
+    private static void SetLevelPostfix(StickRLQTE __instance)
+    {
+        if (Il2CppGuard.Is<StickRLQTE>(__instance)) Begin(__instance, "SetLevel");
+    }
 
     [HarmonyPatch(nameof(StickRLQTE.Update))]
     [HarmonyPrefix]
     private static void UpdatePrefix(StickRLQTE __instance)
+    {
+        if (Il2CppGuard.Is<StickRLQTE>(__instance)) Track(__instance);
+    }
+
+    private static void Track(StickRLQTE __instance)
     {
         // The game may copy fresh level data in at any point; re-apply if our value was replaced.
         var value = __instance.stickRLQTEValue;
@@ -53,6 +62,11 @@ internal static class HarpoonStrugglePatch
     [HarmonyPatch(nameof(StickRLQTE.OnDisable))]
     [HarmonyPostfix]
     private static void OnDisablePostfix(StickRLQTE __instance)
+    {
+        if (Il2CppGuard.Is<StickRLQTE>(__instance)) End(__instance);
+    }
+
+    private static void End(StickRLQTE __instance)
     {
         Plugin.Logger.LogInfo($"Struggle ended: gauge rises seen={jumps}, largest single rise={largestJump:0.###} " +
                               $"(vanilla per input={vanillaGain:0.###}, boosted={boostedGain:0.###}), final score={__instance._currentPlayerScore:0.###}");

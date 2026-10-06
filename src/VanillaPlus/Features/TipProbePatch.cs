@@ -53,7 +53,9 @@ internal static class TipProbePatch
         }
     }
 
-    private static string Who(SushiBarCustomer customer) => customer == null ? "null" : $"{customer.name}#{customer.GetInstanceID()}";
+
+    private static string Who(SushiBarCustomer customer) =>
+        !Il2CppGuard.Is<SushiBarCustomer>(customer) ? "(not a customer)" : customer == null ? "(destroyed)" : $"{customer.name}#{customer.GetInstanceID()}";
 
     [HarmonyPatch(typeof(GameFormulaManager), nameof(GameFormulaManager.GiveTipChance))]
     [HarmonyPostfix]
@@ -124,21 +126,9 @@ internal static class TipProbePatch
     [HarmonyPostfix]
     private static void EatFinishedEnd(SushiBarCustomer __instance) => Log($"< EatFnished end for {Who(__instance)}");
 
-    [HarmonyPatch(typeof(SushiBarCustomer), nameof(SushiBarCustomer.AfterEatingBehavior))]
-    [HarmonyPrefix]
-    private static void AfterEatingBegin(SushiBarCustomer __instance) => Log($"> AfterEatingBehavior begin for {Who(__instance)}");
-
-    [HarmonyPatch(typeof(SushiBarCustomer), nameof(SushiBarCustomer.AfterEatingBehavior))]
-    [HarmonyPostfix]
-    private static void AfterEatingEnd(SushiBarCustomer __instance) => Log($"< AfterEatingBehavior end for {Who(__instance)}");
-
     [HarmonyPatch(typeof(SushiBarAnalyticsTodayData), nameof(SushiBarAnalyticsTodayData.AddStaffTips))]
     [HarmonyPostfix]
     private static void AddStaffTips(int addValue) => Log($"AddStaffTips(addValue={addValue})");
-
-    [HarmonyPatch(typeof(SushiBarStaff), nameof(SushiBarStaff.IsActivateTipMaster))]
-    [HarmonyPostfix]
-    private static void TipMaster(SushiBarStaff __instance, bool __result) => Log($"IsActivateTipMaster = {__result} for staff {__instance.name}, charm={__instance.Charm}");
 
     private static void LogBuff(SushiBarCustomer __instance, int TID) =>
         Log($"AddBuff(TID={TID}) on {Who(__instance)}, revenueBuffParameter={__instance.RevenueBuffParameter:0.###}");
