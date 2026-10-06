@@ -4,87 +4,92 @@ using UnityEngine;
 namespace VanillaPlus.Features;
 
 // StickRLQTE is the "rock the stick, then mash the button" struggle shown after spearing a fish.
-// Whenever one of its input-driven methods raises the player's score, the raise is multiplied.
-// Score never moves without the player's own input and decay is left alone, so nothing auto-completes.
+// Each struggle carries a StickRLQTEValue with PlayerGuageIncValuePerOneQTEAction: the gauge gained per
+// input. That one number is multiplied. The fish's pull, the starting value and the target are untouched,
+// and the gauge still only moves when the player gives input, so nothing auto-completes.
 [HarmonyPatch(typeof(StickRLQTE))]
 internal static class HarpoonStrugglePatch
 {
-    // Update, OnDirectHandler and OnInputSuccessByPushing may call each other; only the outermost call scales.
-    private static int depth;
-
-    private static int boostedGains;
     private static float vanillaGain;
-    private static float bonusGain;
-    private static int gainsInUpdate, gainsInDirect, gainsInPush;
-
-    [HarmonyPatch(nameof(StickRLQTE.Update))]
-    [HarmonyPrefix]
-    private static void UpdatePrefix(StickRLQTE __instance, out float __state) => Enter(__instance, out __state);
-
-    [HarmonyPatch(nameof(StickRLQTE.Update))]
-    [HarmonyPostfix]
-    private static void UpdatePostfix(StickRLQTE __instance, float __state) => Exit(__instance, __state, ref gainsInUpdate);
-
-    [HarmonyPatch(nameof(StickRLQTE.OnDirectHandler))]
-    [HarmonyPrefix]
-    private static void DirectPrefix(StickRLQTE __instance, out float __state) => Enter(__instance, out __state);
-
-    [HarmonyPatch(nameof(StickRLQTE.OnDirectHandler))]
-    [HarmonyPostfix]
-    private static void DirectPostfix(StickRLQTE __instance, float __state) => Exit(__instance, __state, ref gainsInDirect);
-
-    [HarmonyPatch(nameof(StickRLQTE.OnInputSuccessByPushing))]
-    [HarmonyPrefix]
-    private static void PushPrefix(StickRLQTE __instance, out float __state) => Enter(__instance, out __state);
-
-    [HarmonyPatch(nameof(StickRLQTE.OnInputSuccessByPushing))]
-    [HarmonyPostfix]
-    private static void PushPostfix(StickRLQTE __instance, float __state) => Exit(__instance, __state, ref gainsInPush);
+    private static float boostedGain;
+    private static float lastScore;
+    private static float largestJump;
+    private static int jumps;
+    private static int setupLogs;
 
     [HarmonyPatch(nameof(StickRLQTE.OnEnable))]
     [HarmonyPostfix]
     private static void OnEnablePostfix(StickRLQTE __instance)
     {
-        depth = 0;
-        boostedGains = 0;
-        vanillaGain = bonusGain = 0f;
-        gainsInUpdate = gainsInDirect = gainsInPush = 0;
-        Plugin.Logger.LogInfo($"Struggle started: type={__instance.GetIl2CppType().Name}, maxValue={__instance.maxValue:0.###}, " +
-                              $"multiplier={ModConfig.StruggleMultiplier.Value:0.##}");
+        setupLogs = 0;
+        largestJump = 0f;
+        jumps = 0;
+        Begin(__instance, "OnEnable");
+    }
+
+    [HarmonyPatch(nameof(StickRLQTE.SetLevel))]
+    [HarmonyPostfix]
+    private static void SetLevelPostfix(StickRLQTE __instance) => Begin(__instance, "SetLevel");
+
+    [HarmonyPatch(nameof(StickRLQTE.Update))]
+    [HarmonyPrefix]
+    private static void UpdatePrefix(StickRLQTE __instance)
+    {
+        // The game may copy fresh level data in at any point; re-apply if our value was replaced.
+        var value = __instance.stickRLQTEValue;
+        if (!Mathf.Approximately(value.PlayerGuageIncValuePerOneQTEAction, boostedGain))
+            Begin(__instance, "Update");
+
+        float score = __instance._currentPlayerScore;
+        float jump = score - lastScore;
+        if (jump > 0.0001f)
+        {
+            jumps++;
+            if (jump > largestJump) largestJump = jump;
+        }
+        lastScore = score;
     }
 
     [HarmonyPatch(nameof(StickRLQTE.OnDisable))]
     [HarmonyPostfix]
-    private static void OnDisablePostfix()
+    private static void OnDisablePostfix(StickRLQTE __instance)
     {
-        Plugin.Logger.LogInfo($"Struggle ended: boostedGains={boostedGains}, vanillaGain={vanillaGain:0.###}, bonusGain={bonusGain:0.###}, " +
-                              $"gains by method: Update={gainsInUpdate}, OnDirectHandler={gainsInDirect}, OnInputSuccessByPushing={gainsInPush}");
+        Plugin.Logger.LogInfo($"Struggle ended: gauge rises seen={jumps}, largest single rise={largestJump:0.###} " +
+                              $"(vanilla per input={vanillaGain:0.###}, boosted={boostedGain:0.###}), final score={__instance._currentPlayerScore:0.###}");
     }
 
-    private static void Enter(StickRLQTE qte, out float before)
+    private static void Begin(StickRLQTE qte, string from)
     {
-        depth++;
-        before = qte._currentPlayerScore;
+        var value = qte.stickRLQTEValue;
+        float vanilla = VanillaGainFor(qte, value.Level, value.PlayerGuageIncValuePerOneQTEAction);
+        float boosted = vanilla * ModConfig.StruggleMultiplier.Value;
+
+        vanillaGain = vanilla;
+        boostedGain = boosted;
+        value.PlayerGuageIncValuePerOneQTEAction = boosted;
+        qte.stickRLQTEValue = value;
+
+        lastScore = qte._currentPlayerScore;
+        if (++setupLogs > 4) return;
+        Plugin.Logger.LogInfo($"Struggle set up ({from}): type={qte.GetIl2CppType().Name}, level={value.Level}, " +
+                              $"gain per input {vanilla:0.###} -> {boosted:0.###}, start={value.PlayerFirstValue:0.###}, " +
+                              $"fish pull per sec={value.EnemyGuageDescValuePerOneSec:0.###}, target={value.MaxValue:0.###}");
     }
 
-    private static void Exit(StickRLQTE qte, float before, ref int methodCounter)
+    // Always derived from the game's own level table, so re-applying never compounds the multiplier.
+    private static float VanillaGainFor(StickRLQTE qte, int level, float current)
     {
-        depth--;
-        if (depth > 0) return;
-        depth = 0;
+        var table = qte.levelDatas?.datas;
+        if (table != null)
+        {
+            for (int i = 0; i < table.Count; i++)
+            {
+                var row = table[i];
+                if (row.Level == level) return row.PlayerGuageIncValuePerOneQTEAction;
+            }
+        }
 
-        float after = qte._currentPlayerScore;
-        float gain = after - before;
-        if (gain <= 0f) return;
-
-        float boosted = after + gain * (ModConfig.StruggleMultiplier.Value - 1f);
-        float max = qte.maxValue;
-        if (max > after) boosted = Mathf.Min(boosted, max);
-        qte._currentPlayerScore = boosted;
-
-        methodCounter++;
-        boostedGains++;
-        vanillaGain += gain;
-        bonusGain += boosted - after;
+        // No table row: fall back to the live value, undoing our own boost if it is already applied.
+        return Mathf.Approximately(current, boostedGain) && vanillaGain > 0f ? vanillaGain : current;
     }
 }
