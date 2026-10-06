@@ -1,6 +1,6 @@
 # Dave the Diver: Vanilla+
 
-A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and the multipliers are modest. It adds no HUD elements, no fish health bars, no auto-pickup and no item spawning, and it never touches save data.
+A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and the multipliers are modest. It adds no HUD elements, no fish health bars and no item spawning, and it never touches save data.
 
 ## Status
 
@@ -10,6 +10,7 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Clarity toggle (remove edge blur and darkening) | Implemented, awaiting in-game test |
 | FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
 | Easier harpoon struggle | Implemented, awaiting in-game test |
+| Auto pickup | Implemented, awaiting in-game test |
 | Perfect pour tip buff | Not implemented yet. A log-only probe gathers the data first |
 
 Nothing here has been confirmed in game yet.
@@ -66,6 +67,13 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | HarpoonStruggle | StruggleMultiplier | 1.5 | Progress multiplier per input. 1.0 = vanilla. Range 1 to 3. |
 | PerfectPourTip | Enabled | true | Slightly raise tip chance after a perfect green tea or beer pour. |
 | PerfectPourTip | PerfectPourTipMultiplier | 1.15 | Tip chance multiplier, clamped to the game's maximum. 1.0 = vanilla. Range 1 to 2. |
+| AutoPickup | Enabled | true | Master toggle: pick up nearby things while diving, as if the interact button had been pressed. |
+| AutoPickup | AutoPickupItems | true | Dropped items and materials. Weapons and harpoon heads are never auto-picked. |
+| AutoPickup | AutoPickupAmmoBox | true | Ammo boxes, unless the current gun is full. |
+| AutoPickup | AutoPickupFish | false | Dead or sleeping fish that only need the interact button. |
+| AutoPickup | AutoOpenChests | false | Open chests automatically. |
+| AutoPickup | AutoPickupOxygenBox | true | Include oxygen chests when AutoOpenChests is on (fixed radius 1.0). |
+| AutoPickup | PickupRadius | 1.0 | Pickup distance in game units. Range 0.5 to 5. |
 | Debug | TipProbe | true | Temporary. Logs sushi bar drink, payment and tip chance calls. Changes nothing in the game. |
 
 ### FPS warning
@@ -109,4 +117,4 @@ The project references the interop assemblies in place from `<GamePath>\BepInEx\
 
 ## Credits
 
-Project setup and class discovery were informed by [WhiteMinds/dave-diver-expansion](https://github.com/WhiteMinds/dave-diver-expansion) (MIT) and [devopsdinosaur/dave-the-diver-mods](https://github.com/devopsdinosaur/dave-the-diver-mods). No code is copied from either.
+Project setup and class discovery were informed by [WhiteMinds/dave-diver-expansion](https://github.com/WhiteMinds/dave-diver-expansion) (MIT) and [devopsdinosaur/dave-the-diver-mods](https://github.com/devopsdinosaur/dave-the-diver-mods). The auto pickup feature is adapted from dave-diver-expansion's AutoPickup under its MIT licence. No code is taken from dave-the-diver-mods.

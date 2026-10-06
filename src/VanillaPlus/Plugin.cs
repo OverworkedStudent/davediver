@@ -34,6 +34,9 @@ public class Plugin : BasePlugin
             $"StruggleMultiplier={ModConfig.StruggleMultiplier.Value:0.##}");
         LogFeature("Perfect pour tip", false,
             $"not implemented yet; config Enabled={ModConfig.PerfectPourTipEnabled.Value}, PerfectPourTipMultiplier={ModConfig.PerfectPourTipMultiplier.Value:0.##}");
+        LogFeature("Auto pickup", ModConfig.AutoPickupEnabled.Value,
+            $"items={ModConfig.AutoPickupItems.Value}, ammo={ModConfig.AutoPickupAmmoBox.Value}, fish={ModConfig.AutoPickupFish.Value}, " +
+            $"chests={ModConfig.AutoOpenChests.Value}, oxygen={ModConfig.AutoPickupOxygenBox.Value}, radius={ModConfig.PickupRadius.Value:0.##}");
         LogFeature("Tip probe (debug, log only)", ModConfig.TipProbe.Value, null);
 
         // Feature patch classes live in Features/ and are applied here, one PatchAll per enabled feature.
@@ -43,6 +46,8 @@ public class Plugin : BasePlugin
             Apply("FPS unlock", typeof(Features.FpsUnlockPatch));
         if (ModConfig.StruggleEnabled.Value && ModConfig.StruggleMultiplier.Value > 1f)
             Apply("Harpoon struggle", typeof(Features.HarpoonStrugglePatch));
+        if (ModConfig.AutoPickupEnabled.Value)
+            Apply("Auto pickup", typeof(Features.AutoPickupPatch));
         // The perfect pour tip buff itself is not written yet; the probe only gathers the data it needs.
         if (ModConfig.TipProbe.Value)
             Apply("Tip probe (log only)", typeof(Features.TipProbePatch));

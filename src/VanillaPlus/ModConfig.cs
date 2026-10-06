@@ -16,6 +16,14 @@ internal static class ModConfig
     public static ConfigEntry<bool> PerfectPourTipEnabled;
     public static ConfigEntry<float> PerfectPourTipMultiplier;
 
+    public static ConfigEntry<bool> AutoPickupEnabled;
+    public static ConfigEntry<bool> AutoPickupItems;
+    public static ConfigEntry<bool> AutoPickupAmmoBox;
+    public static ConfigEntry<bool> AutoPickupFish;
+    public static ConfigEntry<bool> AutoOpenChests;
+    public static ConfigEntry<bool> AutoPickupOxygenBox;
+    public static ConfigEntry<float> PickupRadius;
+
     public static ConfigEntry<bool> TipProbe;
 
     private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
@@ -33,6 +41,22 @@ internal static class ModConfig
         BindClarityEffect(cfg, "DepthOfField", true, "Depth of field blur.");
         BindClarityEffect(cfg, "ChromaticAberration", true, "Colour fringing towards the screen edges.");
         BindClarityEffect(cfg, "LensDistortion", false, "Lens warping. Off by default because it is not a blur or darkening effect.");
+
+        AutoPickupEnabled = cfg.Bind("AutoPickup", "Enabled", true,
+            "Master toggle: pick up nearby things while diving, as if the interact button had been pressed.");
+        AutoPickupItems = cfg.Bind("AutoPickup", "AutoPickupItems", true,
+            "Pick up dropped items and materials. Weapons and harpoon heads are never picked up automatically.");
+        AutoPickupAmmoBox = cfg.Bind("AutoPickup", "AutoPickupAmmoBox", true,
+            "Pick up ammo boxes, unless the current gun is already full. Needs AutoPickupItems.");
+        AutoPickupFish = cfg.Bind("AutoPickup", "AutoPickupFish", false,
+            "Pick up dead or sleeping fish that only need the interact button.");
+        AutoOpenChests = cfg.Bind("AutoPickup", "AutoOpenChests", false,
+            "Open chests automatically.");
+        AutoPickupOxygenBox = cfg.Bind("AutoPickup", "AutoPickupOxygenBox", true,
+            "Include oxygen chests when AutoOpenChests is on. They always use a radius of 1.0 so the oxygen is not wasted.");
+        PickupRadius = cfg.Bind("AutoPickup", "PickupRadius", 1f,
+            new ConfigDescription("Distance from Dave within which things are picked up, in game units.",
+                new AcceptableValueRange<float>(0.5f, 5f)));
 
         TipProbe = cfg.Bind("Debug", "TipProbe", true,
             "Temporary. Logs sushi bar drink, payment and tip chance calls to LogOutput.log. Changes nothing in the game.");
