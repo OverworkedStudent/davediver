@@ -7,13 +7,13 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Feature | State |
 | --- | --- |
 | Plugin skeleton, config, startup logging | Done |
-| Clarity toggle (remove edge blur and darkening) | Implemented, awaiting in-game test |
+| Clarity toggle (remove edge blur and darkening) | Working in game |
 | FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
-| Easier harpoon struggle | Implemented, awaiting in-game test |
-| Auto pickup | Implemented, awaiting in-game test |
-| Perfect pour tip buff | Not implemented yet. A log-only probe gathers the data first |
+| Easier harpoon struggle | Reworked after two failed attempts, awaiting in-game test |
+| Auto pickup | Working in game |
+| Perfect pour tip buff | Implemented, awaiting in-game test |
 
-Nothing here has been confirmed in game yet.
+"Working in game" means confirmed from in-game logs on game version v1.0.6.2113.
 
 Developed against game build 25315876 (Unity 6000.0.52f1) and BepInEx 6.0.0-be.788.
 
