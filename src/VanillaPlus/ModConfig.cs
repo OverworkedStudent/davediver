@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using UnityEngine;
 
 namespace VanillaPlus;
 
@@ -24,7 +25,20 @@ internal static class ModConfig
     public static ConfigEntry<bool> AutoPickupOxygenBox;
     public static ConfigEntry<float> PickupRadius;
 
-    public static ConfigEntry<bool> TipProbe;
+    public static ConfigEntry<bool> StealthEnabled;
+    public static ConfigEntry<float> StealthDetectionMultiplier;
+
+    public static ConfigEntry<bool> VillageSpeedEnabled;
+    public static ConfigEntry<float> VillageSpeedMultiplier;
+
+    public static ConfigEntry<bool> DiveMapEnabled;
+    public static ConfigEntry<Features.DiveMapMode> DiveMapStartMode;
+    public static ConfigEntry<KeyCode> DiveMapToggleKey;
+    public static ConfigEntry<Features.DiveMapControllerToggle> DiveMapControllerToggleCombo;
+    public static ConfigEntry<Features.DiveMapCorner> DiveMapMiniCorner;
+    public static ConfigEntry<float> DiveMapMiniSize;
+    public static ConfigEntry<float> DiveMapMiniRadius;
+    public static ConfigEntry<float> DiveMapOpacity;
 
     private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
 
@@ -58,8 +72,36 @@ internal static class ModConfig
             new ConfigDescription("Distance from Dave within which things are picked up, in game units.",
                 new AcceptableValueRange<float>(0.5f, 5f)));
 
-        TipProbe = cfg.Bind("Debug", "TipProbe", true,
-            "Temporary. Logs sushi bar drink, payment and tip chance calls to LogOutput.log. Changes nothing in the game.");
+        DiveMapEnabled = cfg.Bind("DiveMap", "Enabled", true,
+            "Master toggle for the dive map. While the map is switched Off in game it costs nothing.");
+        DiveMapStartMode = cfg.Bind("DiveMap", "StartMode", Features.DiveMapMode.Off,
+            "How the map starts each session: Off, Mini (round corner map) or Big (full level). The toggle cycles Off -> Mini -> Big -> Off.");
+        DiveMapToggleKey = cfg.Bind("DiveMap", "ToggleKey", KeyCode.M,
+            "Keyboard key that cycles the map.");
+        DiveMapControllerToggleCombo = cfg.Bind("DiveMap", "ControllerToggle", Features.DiveMapControllerToggle.BothStickClicks,
+            "Controller shortcut that cycles the map: BothStickClicks (press L3 and R3 together), SelectPlusRightStickClick, or None.");
+        DiveMapMiniCorner = cfg.Bind("DiveMap", "MiniCorner", Features.DiveMapCorner.TopRight,
+            "Screen corner for the round map. TopRight is the corner the dive HUD leaves free; item pickup pop-ups use the bottom right.");
+        DiveMapMiniSize = cfg.Bind("DiveMap", "MiniSize", 0.2f,
+            new ConfigDescription("Diameter of the round map as a share of screen height.",
+                new AcceptableValueRange<float>(0.12f, 0.4f)));
+        DiveMapMiniRadius = cfg.Bind("DiveMap", "MiniRadius", 15f,
+            new ConfigDescription("How far the round map sees around Dave, in game units. Larger shows more but smaller.",
+                new AcceptableValueRange<float>(8f, 40f)));
+        DiveMapOpacity = cfg.Bind("DiveMap", "Opacity", 1f,
+            new ConfigDescription("Opacity of the map picture.", new AcceptableValueRange<float>(0.4f, 1f)));
+
+        StealthEnabled = cfg.Bind("Stealth", "Enabled", true,
+            "Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him.");
+        StealthDetectionMultiplier = cfg.Bind("Stealth", "DetectionSpeedMultiplier", 0.7f,
+            new ConfigDescription("How fast their alert gauge fills while Dave is in view. 1.0 = vanilla, lower = more time to hide.",
+                new AcceptableValueRange<float>(0.25f, 1f)));
+
+        VillageSpeedEnabled = cfg.Bind("VillageSpeed", "Enabled", true,
+            "Move faster in the Sea People Village. Dives are not affected.");
+        VillageSpeedMultiplier = cfg.Bind("VillageSpeed", "SpeedMultiplier", 1.5f,
+            new ConfigDescription("Move speed multiplier in the village. 1.0 = vanilla.",
+                new AcceptableValueRange<float>(1f, 3f)));
 
         FpsEnabled = cfg.Bind("FPS", "Enabled", true,
             "Allow this mod to change the frame cap. Has no effect while TargetFPS is 0.");

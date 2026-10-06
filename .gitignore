@@ -35,3 +35,6 @@ SteamSData/
 
 # Per-session plugin logs
 VanillaPlus-logs/
+
+# Local styling previews (contain game art, never commit)
+local-preview/

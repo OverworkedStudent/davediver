@@ -66,7 +66,12 @@ internal static class PerfectPourTipPatch
 
     [HarmonyPatch(typeof(SushiBarCustomer), nameof(SushiBarCustomer.Served))]
     [HarmonyPostfix]
-    private static void ServedEnd() => servingCustomer = 0;
+    private static void ServedEnd()
+    {
+        // Still set means the game served this customer without rolling for a tip at all.
+        if (servingCustomer != 0) Log("PerfectPourTip: a perfect-pour customer was served but the game rolled no tip for them");
+        servingCustomer = 0;
+    }
 
     [HarmonyPatch(typeof(GameFormulaManager), nameof(GameFormulaManager.GiveTipChance))]
     [HarmonyPostfix]

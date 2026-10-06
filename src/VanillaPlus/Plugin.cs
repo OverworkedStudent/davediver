@@ -38,7 +38,13 @@ public class Plugin : BasePlugin
         LogFeature("Auto pickup", ModConfig.AutoPickupEnabled.Value,
             $"items={ModConfig.AutoPickupItems.Value}, ammo={ModConfig.AutoPickupAmmoBox.Value}, fish={ModConfig.AutoPickupFish.Value}, " +
             $"chests={ModConfig.AutoOpenChests.Value}, oxygen={ModConfig.AutoPickupOxygenBox.Value}, radius={ModConfig.PickupRadius.Value:0.##}");
-        LogFeature("Tip probe (debug, log only)", ModConfig.TipProbe.Value, null);
+        LogFeature("Gentler stealth", ModConfig.StealthEnabled.Value,
+            $"DetectionSpeedMultiplier={ModConfig.StealthDetectionMultiplier.Value:0.##}");
+        LogFeature("Village speed", ModConfig.VillageSpeedEnabled.Value,
+            $"SpeedMultiplier={ModConfig.VillageSpeedMultiplier.Value:0.##}");
+        LogFeature("Dive map", ModConfig.DiveMapEnabled.Value,
+            $"start={ModConfig.DiveMapStartMode.Value}, key={ModConfig.DiveMapToggleKey.Value}, controller={ModConfig.DiveMapControllerToggleCombo.Value}, " +
+            $"corner={ModConfig.DiveMapMiniCorner.Value}");
 
         // Feature patch classes live in Features/ and are applied here, one PatchAll per enabled feature.
         if (ModConfig.ClarityEnabled.Value)
@@ -51,8 +57,23 @@ public class Plugin : BasePlugin
             Apply("Auto pickup", typeof(Features.AutoPickupPatch));
         if (ModConfig.PerfectPourTipEnabled.Value && ModConfig.PerfectPourTipMultiplier.Value > 1f)
             Apply("Perfect pour tip", typeof(Features.PerfectPourTipPatch));
-        if (ModConfig.TipProbe.Value)
-            Apply("Tip probe (log only)", typeof(Features.TipProbePatch));
+        if (ModConfig.StealthEnabled.Value && ModConfig.StealthDetectionMultiplier.Value < 1f)
+            Apply("Gentler stealth", typeof(Features.GentleStealthPatch));
+        if (ModConfig.VillageSpeedEnabled.Value && ModConfig.VillageSpeedMultiplier.Value > 1f)
+            Apply("Village speed", typeof(Features.VillageSpeedPatch));
+
+        if (ModConfig.DiveMapEnabled.Value)
+        {
+            try
+            {
+                Features.DiveMap.Start();
+                Logger.LogInfo("Started: Dive map");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Failed to start Dive map, feature disabled: {e}");
+            }
+        }
     }
 
     private static void Apply(string feature, Type patchClass)

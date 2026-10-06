@@ -1,6 +1,6 @@
 # Dave the Diver: Vanilla+
 
-A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and the multipliers are modest. It adds no HUD elements, no fish health bars and no item spawning, and it never touches save data.
+A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and the multipliers are modest. It adds no fish health bars and no item spawning, and it never touches save data. The one HUD addition is an optional dive map that stays off until you call it up.
 
 ## Status
 
@@ -12,6 +12,9 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Easier harpoon struggle | Reworked after two failed attempts, awaiting in-game test |
 | Auto pickup | Working in game |
 | Perfect pour tip buff | Implemented, awaiting in-game test |
+| Dive map | Implemented, awaiting in-game test |
+| Gentler stealth (glacier passage) | Implemented, awaiting in-game test |
+| Sea People Village walk speed | Implemented, awaiting in-game test |
 
 "Working in game" means confirmed from in-game logs on game version v1.0.6.2113.
 
@@ -74,7 +77,24 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | AutoPickup | AutoOpenChests | false | Open chests automatically. |
 | AutoPickup | AutoPickupOxygenBox | true | Include oxygen chests when AutoOpenChests is on (fixed radius 1.0). |
 | AutoPickup | PickupRadius | 1.0 | Pickup distance in game units. Range 0.5 to 5. |
-| Debug | TipProbe | true | Temporary. Logs sushi bar drink, payment and tip chance calls. Changes nothing in the game. |
+| DiveMap | Enabled | true | Master toggle for the dive map. |
+| DiveMap | StartMode | Off | How the map starts each session: Off, Mini or Big. |
+| DiveMap | ToggleKey | M | Keyboard key that cycles Off, Mini, Big. |
+| DiveMap | ControllerToggle | BothStickClicks | Controller shortcut: BothStickClicks (L3 and R3 together), SelectPlusRightStickClick, or None. |
+| DiveMap | MiniCorner | TopRight | Screen corner for the round map. TopRight is the corner the dive HUD leaves free. |
+| DiveMap | MiniSize | 0.2 | Diameter of the round map as a share of screen height. Range 0.12 to 0.4. |
+| DiveMap | MiniRadius | 15 | How far the round map sees around Dave, in game units. Range 8 to 40. |
+| DiveMap | Opacity | 1.0 | Opacity of the map picture. Range 0.4 to 1. |
+| Stealth | Enabled | true | Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him. |
+| Stealth | DetectionSpeedMultiplier | 0.7 | How fast their alert gauge fills. 1.0 = vanilla. Range 0.25 to 1. |
+| VillageSpeed | Enabled | true | Move faster in the Sea People Village only. |
+| VillageSpeed | SpeedMultiplier | 1.5 | Move speed multiplier in the village. 1.0 = vanilla. Range 1 to 3. |
+
+### Dive map
+
+Press `M`, or click both sticks together on a controller, to cycle the map: off, a round corner map, the full level, off. It marks Dave and the ways back to the boat (escape pods and mirrors) and nothing else: no fish, chests or loot. On the corner map, when no exit is in range, a small boat icon on the rim points toward the nearest one.
+
+The corner map is drawn as a round instrument to match the game's oxygen dial, and Dave and the exits use the game's own icons, looked up from what the game already has loaded. While the map is off it renders nothing. While it is on, the level is drawn a second time into a small texture every third frame, which costs a few frames per second on slower hardware. The map hides itself in the pause menu and cutscenes, and does not appear in the Sea People Village, which has its own map.
 
 ### FPS warning
 
@@ -117,4 +137,4 @@ The project references the interop assemblies in place from `<GamePath>\BepInEx\
 
 ## Credits
 
-Project setup and class discovery were informed by [WhiteMinds/dave-diver-expansion](https://github.com/WhiteMinds/dave-diver-expansion) (MIT) and [devopsdinosaur/dave-the-diver-mods](https://github.com/devopsdinosaur/dave-the-diver-mods). The auto pickup feature is adapted from dave-diver-expansion's AutoPickup under its MIT licence. No code is taken from dave-the-diver-mods.
+Project setup and class discovery were informed by [WhiteMinds/dave-diver-expansion](https://github.com/WhiteMinds/dave-diver-expansion) (MIT) and [devopsdinosaur/dave-the-diver-mods](https://github.com/devopsdinosaur/dave-the-diver-mods). The auto pickup feature and the way the dive map picture is produced are adapted from dave-diver-expansion's AutoPickup and DiveMap under its MIT licence; the village speed feature uses a technique its notes document. No code is taken from dave-the-diver-mods.
