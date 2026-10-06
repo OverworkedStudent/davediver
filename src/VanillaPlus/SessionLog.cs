@@ -26,11 +26,16 @@ internal static class SessionLog
                 old.Delete();
 
             writer = new StreamWriter(Path.Combine(dir, $"session-{DateTime.Now:yyyyMMdd-HHmmss}.log")) { AutoFlush = true };
-            source.LogEvent += (_, e) => writer.WriteLine($"{DateTime.Now:HH:mm:ss} [{e.Level}] {e.Data}");
+            source.LogEvent += OnLog;
         }
         catch (Exception e)
         {
             source.LogWarning($"Session log unavailable: {e.Message}");
         }
+    }
+
+    private static void OnLog(object sender, LogEventArgs e)
+    {
+        writer.WriteLine($"{DateTime.Now:HH:mm:ss} [{e.Level}] {e.Data}");
     }
 }
