@@ -79,8 +79,8 @@ internal static class ModConfig
             "How the map starts each session: Off, Mini (round corner map) or Big (full level). The toggle cycles Off -> Mini -> Big -> Off.");
         DiveMapToggleKey = cfg.Bind("DiveMap", "ToggleKey", KeyCode.M,
             "Keyboard key that cycles the map.");
-        DiveMapControllerToggleCombo = cfg.Bind("DiveMap", "ControllerToggle", Features.DiveMapControllerToggle.BothStickClicks,
-            "Controller shortcut that cycles the map: BothStickClicks (press L3 and R3 together), SelectPlusRightStickClick, or None.");
+        DiveMapControllerToggleCombo = cfg.Bind("DiveMap", "ControllerToggle", Features.DiveMapControllerToggle.HoldRightStickClick,
+            "Controller shortcut that cycles the map: HoldRightStickClick (press the right stick in and hold for half a second), BothStickClicks, SelectPlusRightStickClick, or None.");
         DiveMapMiniCorner = cfg.Bind("DiveMap", "MiniCorner", Features.DiveMapCorner.TopRight,
             "Screen corner for the round map. TopRight is the corner the dive HUD leaves free; item pickup pop-ups use the bottom right.");
         DiveMapMiniSize = cfg.Bind("DiveMap", "MiniSize", 0.2f,

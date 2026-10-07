@@ -25,7 +25,7 @@ public enum DiveMapMode { Off, Mini, Big }
 
 public enum DiveMapCorner { TopRight, TopLeft, BottomRight, BottomLeft }
 
-public enum DiveMapControllerToggle { None, BothStickClicks, SelectPlusRightStickClick }
+public enum DiveMapControllerToggle { HoldRightStickClick, BothStickClicks, SelectPlusRightStickClick, None }
 
 internal static class DiveMap
 {
@@ -74,6 +74,8 @@ internal static class DiveMap
     private static float nextFishScan, nextGradeRefresh;
     private static int fishLogs;
     private const float StickComboWindow = 0.35f;
+    private static float rightHeldSince = -1f;
+    private static bool rightHoldFired;
     private static float lastLeftClick = -1f, lastRightClick = -1f;
 
     private static Sprite discSprite, ringSprite, panelSprite, panelFrameSprite, dotSprite;
@@ -280,6 +282,16 @@ internal static class DiveMap
             var right = pad.rightStickButton;
             if (combo == DiveMapControllerToggle.SelectPlusRightStickClick)
                 return pad.selectButton.isPressed && right.wasPressedThisFrame;
+
+            if (combo == DiveMapControllerToggle.HoldRightStickClick)
+            {
+                // One button, held briefly, so a stray click during play does nothing.
+                if (!right.isPressed) { rightHeldSince = -1f; rightHoldFired = false; return false; }
+                if (rightHeldSince < 0f) rightHeldSince = Time.unscaledTime;
+                if (rightHoldFired || Time.unscaledTime - rightHeldSince < 0.4f) return false;
+                rightHoldFired = true;
+                return true;
+            }
 
             var left = pad.leftStickButton;
             // The two clicks only have to land within a moment of each other, not on the same frame.

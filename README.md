@@ -80,7 +80,8 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | DiveMap | Enabled | true | Master toggle for the dive map. |
 | DiveMap | StartMode | Off | How the map starts each session: Off, Mini or Big. |
 | DiveMap | ToggleKey | M | Keyboard key that cycles Off, Mini, Big. |
-| DiveMap | ControllerToggle | BothStickClicks | Controller shortcut: BothStickClicks (L3 and R3 together), SelectPlusRightStickClick, or None. |
+| DiveMap | ControllerToggle | HoldRightStickClick | Controller shortcut: HoldRightStickClick (press the right stick in and hold half a second), BothStickClicks, SelectPlusRightStickClick, or None. |
+| DiveMap | ShowFish | true | Fish as dots: yellow while the species still lacks a 3-star catch, faint once it has one. |
 | DiveMap | MiniCorner | TopRight | Screen corner for the round map. TopRight is the corner the dive HUD leaves free. |
 | DiveMap | MiniSize | 0.2 | Diameter of the round map as a share of screen height. Range 0.12 to 0.4. |
 | DiveMap | MiniRadius | 15 | How far the round map sees around Dave, in game units. Range 8 to 40. |
@@ -92,7 +93,7 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 
 ### Dive map
 
-Press `M`, or click both sticks together on a controller, to cycle the map: off, a round corner map, the full level, off. It marks Dave and the ways back to the boat (escape pods and mirrors) and nothing else: no fish, chests or loot. On the corner map, when no exit is in range, a small boat icon on the rim points toward the nearest one.
+Press `M`, or press and hold the right stick in on a controller, to cycle the map: off, a round corner map, the full level, off. It marks Dave and the ways back to the boat (escape pods and mirrors) and nothing else: no fish, chests or loot. On the corner map, when no exit is in range, a small boat icon on the rim points toward the nearest one.
 
 The corner map is drawn as a round instrument to match the game's oxygen dial, and Dave and the exits use the game's own icons, looked up from what the game already has loaded. While the map is off it renders nothing. While it is on, the level is drawn a second time into a small texture every third frame, which costs a few frames per second on slower hardware. The map hides itself in the pause menu and cutscenes, and does not appear in the Sea People Village, which has its own map.
 
