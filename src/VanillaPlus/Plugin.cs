@@ -67,6 +67,7 @@ public class Plugin : BasePlugin
             try
             {
                 Features.DiveMap.Start();
+                Harmony.PatchAll(typeof(Features.DiveMapPlayerTick));
                 Logger.LogInfo("Started: Dive map");
             }
             catch (Exception e)

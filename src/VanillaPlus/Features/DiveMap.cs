@@ -89,6 +89,10 @@ internal static class DiveMap
     private static float nextScan;
     private static int frameCounter;
     private static int errorLogs;
+    private static int lastTickFrame = -1;
+    private static string lastState = "";
+    private static int inputLogs;
+    private static bool tickedByBehaviour, tickedByPlayer;
 
     public static void Start()
     {
@@ -99,8 +103,24 @@ internal static class DiveMap
         host.AddComponent<DiveMapBehaviour>();
     }
 
-    internal static void Tick()
+    // Called from the injected behaviour and, as a backup, from the player's own Update; runs once per frame.
+    internal static void Tick(bool fromPlayer = false)
     {
+        if (fromPlayer && !tickedByPlayer)
+        {
+            tickedByPlayer = true;
+            Plugin.Logger.LogInfo("DiveMap: receiving frames from the player update");
+        }
+        else if (!fromPlayer && !tickedByBehaviour)
+        {
+            tickedByBehaviour = true;
+            Plugin.Logger.LogInfo("DiveMap: receiving frames from its own behaviour");
+        }
+
+        int frameNumber = Time.frameCount;
+        if (frameNumber == lastTickFrame) return;
+        lastTickFrame = frameNumber;
+
         try
         {
             Run();
@@ -122,6 +142,12 @@ internal static class DiveMap
         var manager = Singleton<InGameManager>._instance;
         PlayerCharacter player = manager != null ? manager.playerCharacter : null;
         Camera mainCamera = player != null ? Camera.main : null;
+        if (player != null && mainCamera == null)
+        {
+            var resolution = Singleton<CameraResolution>._instance;
+            if (resolution != null) mainCamera = resolution.MainCamera;
+        }
+        State(manager == null ? "no dive manager" : player == null ? "no player" : mainCamera == null ? "no main camera" : "in dive");
 
         // The Sea People Village has its own map.
         string scene = SceneManager.GetActiveScene().name ?? "";
@@ -183,8 +209,49 @@ internal static class DiveMap
         PlaceMarkers(big, player.transform.position, size);
     }
 
+    private static void State(string state)
+    {
+        if (state == lastState) return;
+        lastState = state;
+        Plugin.Logger.LogInfo($"DiveMap: state '{state}', scene '{SceneManager.GetActiveScene().name}'");
+    }
+
+    // Logs the first few raw button presses so a toggle that does nothing can be told apart from one never seen.
+    private static void LogInput(string what)
+    {
+        if (inputLogs++ < 12) Plugin.Logger.LogInfo($"DiveMap: saw {what}");
+    }
+
     private static bool TogglePressed()
     {
+        try
+        {
+            var probe = UnityEngine.InputSystem.Gamepad.current;
+            if (probe == null) { if (inputLogs == 0) { inputLogs++; Plugin.Logger.LogInfo("DiveMap: no controller visible to the input system"); } }
+            else
+            {
+                if (probe.leftStickButton.wasPressedThisFrame) LogInput("left stick click");
+                if (probe.rightStickButton.wasPressedThisFrame) LogInput("right stick click");
+            }
+        }
+        catch (Exception e)
+        {
+            if (inputLogs++ < 3) Plugin.Logger.LogWarning($"DiveMap: controller read failed: {e.Message}");
+        }
+        try
+        {
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard != null && keyboard.mKey.wasPressedThisFrame)
+            {
+                LogInput("M key (input system)");
+                if (ModConfig.DiveMapToggleKey.Value == KeyCode.M) return true;
+            }
+        }
+        catch (Exception e)
+        {
+            if (inputLogs++ < 3) Plugin.Logger.LogWarning($"DiveMap: keyboard read failed: {e.Message}");
+        }
+
         try
         {
             if (Input.GetKeyDown(ModConfig.DiveMapToggleKey.Value)) return true;
@@ -827,4 +894,12 @@ public class DiveMapBehaviour : MonoBehaviour
     public DiveMapBehaviour(IntPtr ptr) : base(ptr) { }
 
     private void Update() => DiveMap.Tick();
+}
+
+// Backup driver: if the injected behaviour above never gets its Update, the map still runs during dives.
+[HarmonyLib.HarmonyPatch(typeof(PlayerCharacter), nameof(PlayerCharacter.Update))]
+internal static class DiveMapPlayerTick
+{
+    [HarmonyLib.HarmonyPostfix]
+    private static void Postfix() => DiveMap.Tick(true);
 }
