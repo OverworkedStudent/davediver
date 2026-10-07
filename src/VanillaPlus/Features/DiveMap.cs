@@ -34,7 +34,7 @@ internal static class DiveMap
     private const float ScanInterval = 1f;
     private const float AppearSeconds = 0.14f;
     // The oxygen dial sits 56 units in from the side of the screen; the map mirrors that.
-    private const float CornerMarginX = 56f;
+    private const float CornerMarginX = 110f;   // clear of the mission icon the game pins to the right edge
     private const float CornerMarginY = 44f;
     private const float RimRadius = 0.78f;      // where an off-map exit is pinned, as a share of the dial radius
     private const float InsideRadius = 0.84f;   // exits nearer than this are drawn at their real spot
@@ -68,6 +68,13 @@ internal static class DiveMap
     private static Image daveMarker;
     private static Image rimMarker;
     private static readonly List<Image> exitMarkers = new();
+    private static readonly List<Image> fishMarkers = new();
+    private static readonly List<(Transform at, bool threeStar)> fishShown = new();
+    private static readonly Dictionary<int, int> gradeBySpecies = new();
+    private static float nextFishScan, nextGradeRefresh;
+    private static int fishLogs;
+    private const float StickComboWindow = 0.35f;
+    private static float lastLeftClick = -1f, lastRightClick = -1f;
 
     private static Sprite discSprite, ringSprite, panelSprite, panelFrameSprite, dotSprite;
     private static Sprite daveSprite, exitSprite;
@@ -207,6 +214,7 @@ internal static class DiveMap
         }
 
         PlaceMarkers(big, player.transform.position, size);
+        PlaceFish(big, size);
     }
 
     private static void State(string state)
@@ -274,7 +282,14 @@ internal static class DiveMap
                 return pad.selectButton.isPressed && right.wasPressedThisFrame;
 
             var left = pad.leftStickButton;
-            return (left.isPressed && right.wasPressedThisFrame) || (right.isPressed && left.wasPressedThisFrame);
+            // The two clicks only have to land within a moment of each other, not on the same frame.
+            float now = Time.unscaledTime;
+            if (left.wasPressedThisFrame) lastLeftClick = now;
+            if (right.wasPressedThisFrame) lastRightClick = now;
+            if (lastLeftClick < 0f || lastRightClick < 0f || Mathf.Abs(lastLeftClick - lastRightClick) > StickComboWindow) return false;
+            if (now - Mathf.Max(lastLeftClick, lastRightClick) > StickComboWindow) return false;
+            lastLeftClick = lastRightClick = -1f;
+            return true;
         }
         catch
         {
@@ -774,7 +789,7 @@ internal static class DiveMap
     private static void PlaceMarkers(bool big, Vector3 playerPosition, Vector2 panel)
     {
         float scale = big ? 1.2f : 1f;
-        Vector2 daveSize = daveSprite != null ? new Vector2(22f, 25f) : new Vector2(12f, 12f);
+        Vector2 daveSize = daveSprite != null ? new Vector2(13f, 15f) : new Vector2(9f, 9f);
         Vector2 exitSize = exitSprite != null ? new Vector2(32f, 19f) : new Vector2(11f, 11f);
 
         Show(daveMarker, Normalized(playerPosition), panel, daveSize * scale, 1f);
@@ -841,6 +856,78 @@ internal static class DiveMap
         }
     }
 
+    // Live fish as small dots: bright yellow while you still lack a 3-star catch of that species, faint once
+    // you have one. Positions follow the fish every frame; the list itself is rebuilt twice a second.
+    private static void PlaceFish(bool big, Vector2 panel)
+    {
+        if (!ModConfig.DiveMapShowFish.Value)
+        {
+            for (int i = 0; i < fishMarkers.Count; i++) Hide(fishMarkers[i]);
+            return;
+        }
+
+        float now = Time.unscaledTime;
+        if (now >= nextGradeRefresh)
+        {
+            nextGradeRefresh = now + 5f;
+            gradeBySpecies.Clear();
+        }
+        if (now >= nextFishScan)
+        {
+            nextFishScan = now + 0.5f;
+            fishShown.Clear();
+            foreach (var body in FishRegistry.All)
+            {
+                if (fishShown.Count >= MaxFishMarkers) break;
+                if (body == null || !body.gameObject.activeInHierarchy) continue;
+                var owner = body._ownerFish;
+                if (owner == null || owner.IsDead()) continue;
+                var spec = owner.FishData;
+                if (spec == null) continue;
+
+                int species = spec.FishID;
+                if (!gradeBySpecies.TryGetValue(species, out int grade))
+                {
+                    grade = FishCollectionUtility.GetGrade(species);
+                    gradeBySpecies[species] = grade;
+                    if (fishLogs++ < 25)
+                        Plugin.Logger.LogInfo($"DiveMap: fish '{body.gameObject.name}' id {species}, collection grade {grade}, " +
+                                              $"caught grade {SaveDataCaughtFishRouter.GetCaughtFishGrade(species)}");
+                }
+                fishShown.Add((body.transform, grade >= 3));
+            }
+        }
+
+        var needed = new Color(1f, 0.83f, 0f, 1f);
+        var done = new Color(1f, 1f, 1f, 0.45f);
+        float size = big ? 8f : 7f;
+        int used = 0;
+        for (int i = 0; i < fishShown.Count; i++)
+        {
+            var (at, threeStar) = fishShown[i];
+            if (at == null) continue;
+            Vector2 where = Normalized(at.position);
+            bool inside = big
+                ? where.x >= 0f && where.x <= 1f && where.y >= 0f && where.y <= 1f
+                : (where - new Vector2(0.5f, 0.5f)).magnitude * 2f <= InsideRadius;
+            if (!inside) continue;
+
+            if (used >= fishMarkers.Count)
+            {
+                var marker = Marker("Fish", null, needed);
+                marker.transform.SetAsFirstSibling(); // under the exits and Dave
+                fishMarkers.Add(marker);
+            }
+            var image = fishMarkers[used++];
+            var wanted = threeStar ? done : needed;
+            if (image.color != wanted) image.color = wanted;
+            Show(image, where, panel, new Vector2(threeStar ? size * 0.75f : size, threeStar ? size * 0.75f : size), wanted.a);
+        }
+        for (int i = used; i < fishMarkers.Count; i++) Hide(fishMarkers[i]);
+    }
+
+    private const int MaxFishMarkers = 80;
+
     private static void Hide(Image marker)
     {
         var go = marker.gameObject;
@@ -877,6 +964,9 @@ internal static class DiveMap
         daveMarker = null;
         rimMarker = null;
         exitMarkers.Clear();
+        fishMarkers.Clear();
+        fishShown.Clear();
+        gradeBySpecies.Clear();
         exits.Clear();
         headlightOverlays.Clear();
         overlaysFound = false;

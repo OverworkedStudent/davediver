@@ -39,6 +39,7 @@ internal static class ModConfig
     public static ConfigEntry<float> DiveMapMiniSize;
     public static ConfigEntry<float> DiveMapMiniRadius;
     public static ConfigEntry<float> DiveMapOpacity;
+    public static ConfigEntry<bool> DiveMapShowFish;
 
     private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
 
@@ -88,6 +89,8 @@ internal static class ModConfig
         DiveMapMiniRadius = cfg.Bind("DiveMap", "MiniRadius", 15f,
             new ConfigDescription("How far the round map sees around Dave, in game units. Larger shows more but smaller.",
                 new AcceptableValueRange<float>(8f, 40f)));
+        DiveMapShowFish = cfg.Bind("DiveMap", "ShowFish", true,
+            "Show live fish as dots: bright yellow while you still lack a 3-star catch of that species, faint once you have one.");
         DiveMapOpacity = cfg.Bind("DiveMap", "Opacity", 1f,
             new ConfigDescription("Opacity of the map picture.", new AcceptableValueRange<float>(0.4f, 1f)));
 

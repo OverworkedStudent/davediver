@@ -21,7 +21,6 @@ internal static class AutoPickupPatch
 
     private static readonly HashSet<PickupInstanceItem> items = new();
     private static readonly HashSet<InstanceItemChest> chests = new();
-    private static readonly HashSet<FishInteractionBody> fish = new();
     private static readonly HashSet<GameObject> pending = new();
     // Picking something up can disable it at once, which edits the sets above, so loops run over copies.
     private static readonly List<PickupInstanceItem> itemBuffer = new();
@@ -48,9 +47,6 @@ internal static class AutoPickupPatch
     [HarmonyPostfix]
     private static void ChestOpened(InstanceItemChest __instance) => chests.Remove(__instance);
 
-    [HarmonyPatch(typeof(FishInteractionBody), nameof(FishInteractionBody.Awake))]
-    [HarmonyPostfix]
-    private static void FishAwake(FishInteractionBody __instance) => fish.Add(__instance);
 
     [HarmonyPatch(typeof(PlayerCharacter), nameof(PlayerCharacter.Update))]
     [HarmonyPostfix]
@@ -62,7 +58,7 @@ internal static class AutoPickupPatch
             nextPurge = now + PurgeInterval;
             items.RemoveWhere(i => i == null);
             chests.RemoveWhere(c => c == null);
-            fish.RemoveWhere(f => f == null);
+            FishRegistry.All.RemoveWhere(f => f == null);
             pending.RemoveWhere(g => g == null);
         }
 
@@ -128,7 +124,7 @@ internal static class AutoPickupPatch
 
     private static void PickupFish(PlayerCharacter player, Vector3 playerPos, float radius)
     {
-        foreach (var body in fish)
+        foreach (var body in FishRegistry.All)
         {
             if (body == null) continue;
             GameObject go = body.gameObject;

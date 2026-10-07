@@ -53,6 +53,8 @@ public class Plugin : BasePlugin
             Apply("FPS unlock", typeof(Features.FpsUnlockPatch));
         if (ModConfig.StruggleEnabled.Value && ModConfig.StruggleMultiplier.Value > 1f)
             Apply("Harpoon struggle", typeof(Features.HarpoonStrugglePatch));
+        if (ModConfig.AutoPickupEnabled.Value || ModConfig.DiveMapEnabled.Value)
+            Apply("Fish registry", typeof(Features.FishRegistry));
         if (ModConfig.AutoPickupEnabled.Value)
             Apply("Auto pickup", typeof(Features.AutoPickupPatch));
         if (ModConfig.PerfectPourTipEnabled.Value && ModConfig.PerfectPourTipMultiplier.Value > 1f)
