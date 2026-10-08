@@ -61,6 +61,5 @@ cat <<'EOF'
   Then start the game. The first start takes a few minutes with a black
   screen or console while BepInEx prepares itself. That is normal.
 
-  Map toggle on a controller: press the right stick in and hold it for
-  half a second.
+  Map toggle on a controller: click both sticks in together (L3 + R3).
 EOF

@@ -51,8 +51,6 @@ internal static class ModConfig
     public static ConfigEntry<bool> CrabTrapEnabled;
     public static ConfigEntry<float> CrabTrapSeconds;
 
-    public static ConfigEntry<bool> BalatroSpeedEnabled;
-    public static ConfigEntry<float> BalatroSpeedMultiplier;
 
     private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
 
@@ -92,8 +90,8 @@ internal static class ModConfig
             "How the map starts each session: Off, Mini (round corner map) or Big (full level). The toggle cycles Off -> Mini -> Big -> Off.");
         DiveMapToggleKey = cfg.Bind("DiveMap", "ToggleKey", KeyCode.M,
             "Keyboard key that cycles the map.");
-        DiveMapControllerToggleCombo = cfg.Bind("DiveMap", "ControllerToggle", Features.DiveMapControllerToggle.HoldRightStickClick,
-            "Controller shortcut that cycles the map: HoldRightStickClick (press the right stick in and hold for half a second), BothStickClicks, SelectPlusRightStickClick, or None.");
+        DiveMapControllerToggleCombo = cfg.Bind("DiveMap", "ControllerToggle", Features.DiveMapControllerToggle.BothStickClicks,
+            "Controller shortcut that cycles the map: BothStickClicks (press L3 and R3 together), HoldRightStickClick (hold the right stick in for half a second), SelectPlusRightStickClick, or None.");
         DiveMapMiniCorner = cfg.Bind("DiveMap", "MiniCorner", Features.DiveMapCorner.TopRight,
             "Screen corner for the round map. TopRight is the corner the dive HUD leaves free; item pickup pop-ups use the bottom right.");
         DiveMapMiniSize = cfg.Bind("DiveMap", "MiniSize", 0.2f,
@@ -126,12 +124,6 @@ internal static class ModConfig
         CrabTrapSeconds = cfg.Bind("CrabTrap", "Seconds", 5f,
             new ConfigDescription("Longest a crab trap takes, in seconds. Traps that are already faster are left alone.",
                 new AcceptableValueRange<float>(1f, 600f)));
-
-        BalatroSpeedEnabled = cfg.Bind("Balatro", "Enabled", true,
-            "Speed up the card mini-game.");
-        BalatroSpeedMultiplier = cfg.Bind("Balatro", "SpeedMultiplier", 8f,
-            new ConfigDescription("Pace multiplier for the card mini-game. 1.0 = vanilla.",
-                new AcceptableValueRange<float>(1f, 16f)));
 
         StealthEnabled = cfg.Bind("Stealth", "Enabled", true,
             "Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him.");

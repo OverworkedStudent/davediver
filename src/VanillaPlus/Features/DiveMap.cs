@@ -34,7 +34,7 @@ internal static class DiveMap
     private const float ScanInterval = 1f;
     private const float AppearSeconds = 0.14f;
     // The oxygen dial sits 56 units in from the side of the screen; the map mirrors that.
-    private const float CornerMarginX = 110f;   // clear of the mission icon the game pins to the right edge
+    private const float CornerMarginX = 56f;
     private const float CornerMarginY = 44f;
     private const float RimRadius = 0.78f;      // where an off-map exit is pinned, as a share of the dial radius
     private const float InsideRadius = 0.84f;   // exits nearer than this are drawn at their real spot
@@ -76,7 +76,7 @@ internal static class DiveMap
     private const float StickComboWindow = 0.35f;
     private static float rightHeldSince = -1f;
     private static bool rightHoldFired;
-    private static float lastLeftClick = -1f, lastRightClick = -1f;
+    private static float lastLeftClick = -10f, lastRightClick = -10f;
 
     private static Sprite discSprite, ringSprite, panelSprite, panelFrameSprite, dotSprite;
     private static Sprite daveSprite, exitSprite;
@@ -293,14 +293,18 @@ internal static class DiveMap
                 return true;
             }
 
+            // Both sticks clicked together: one pressed while the other is held down, or the two clicks
+            // landing within a moment of each other.
             var left = pad.leftStickButton;
-            // The two clicks only have to land within a moment of each other, not on the same frame.
             float now = Time.unscaledTime;
-            if (left.wasPressedThisFrame) lastLeftClick = now;
-            if (right.wasPressedThisFrame) lastRightClick = now;
-            if (lastLeftClick < 0f || lastRightClick < 0f || Mathf.Abs(lastLeftClick - lastRightClick) > StickComboWindow) return false;
-            if (now - Mathf.Max(lastLeftClick, lastRightClick) > StickComboWindow) return false;
-            lastLeftClick = lastRightClick = -1f;
+            bool leftNow = left.wasPressedThisFrame, rightNow = right.wasPressedThisFrame;
+            bool together =
+                (rightNow && (left.isPressed || now - lastLeftClick <= StickComboWindow)) ||
+                (leftNow && (right.isPressed || now - lastRightClick <= StickComboWindow));
+            if (leftNow) lastLeftClick = now;
+            if (rightNow) lastRightClick = now;
+            if (!together) return false;
+            lastLeftClick = lastRightClick = -10f;
             return true;
         }
         catch
@@ -801,7 +805,7 @@ internal static class DiveMap
     private static void PlaceMarkers(bool big, Vector3 playerPosition, Vector2 panel)
     {
         float scale = big ? 1.2f : 1f;
-        Vector2 daveSize = daveSprite != null ? new Vector2(13f, 15f) : new Vector2(9f, 9f);
+        Vector2 daveSize = daveSprite != null ? new Vector2(22f, 25f) : new Vector2(12f, 12f);
         Vector2 exitSize = exitSprite != null ? new Vector2(32f, 19f) : new Vector2(11f, 11f);
 
         Show(daveMarker, Normalized(playerPosition), panel, daveSize * scale, 1f);
