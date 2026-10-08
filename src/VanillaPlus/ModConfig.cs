@@ -109,7 +109,7 @@ internal static class ModConfig
             "Raise the odds of chosen fish at spawn points that can already produce them. Also logs the real odds.");
         FishSpawnBoostedFish = cfg.Bind("FishSpawn", "BoostedFish", "Tuna,Marlin",
             "Comma-separated name fragments of the fish to favour, matched against the game's fish names.");
-        FishSpawnMultiplier = cfg.Bind("FishSpawn", "Multiplier", 10f,
+        FishSpawnMultiplier = cfg.Bind("FishSpawn", "Multiplier", 3f,
             new ConfigDescription("How much heavier those fish weigh in each spawn draw. 1.0 = vanilla.",
                 new AcceptableValueRange<float>(1f, 100f)));
 

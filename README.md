@@ -1,6 +1,6 @@
 # Dave the Diver: Vanilla+
 
-A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and the multipliers are modest. It adds no fish health bars and no item spawning, and it never touches save data. The one HUD addition is an optional dive map that stays off until you call it up.
+A quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2CPP. It keeps the vanilla feel: every feature has its own on/off toggle and its strength is a setting. It adds no fish health bars and no item spawning, and it never touches save data. The one HUD addition is an optional dive map that stays off until you call it up.
 
 ## Status
 
@@ -8,16 +8,16 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | --- | --- |
 | Plugin skeleton, config, startup logging | Done |
 | Clarity toggle (remove edge blur and darkening) | Working in game |
-| FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
+| FPS unlock | Implemented, never tested in game. Off by default. See the FPS warning below |
 | Easier harpoon struggle | Working in game |
 | Crab trap timer | Working in game |
 | Auto pickup | Working in game |
 | Perfect pour tip buff | Working in game |
 | Dive map | Working in game |
-| Weapon breakdown hold time | Reworked, awaiting in-game test |
-| Gentler stealth (glacier passage) | Implemented, awaiting in-game test |
+| Weapon breakdown hold time | Working in game (3.5 s down to 1.75 s) |
+| Gentler stealth (glacier passage) | Implemented, never seen to take effect in game |
 | Sea People Village walk speed | Working in game |
-| Fish spawn odds (tuna, marlin) | Odds read and boosted in game; whether it feels right awaits feedback |
+| Fish spawn odds (tuna, marlin) | Working in game |
 
 "Working in game" means confirmed from in-game logs on game version v1.0.6.2113.
 
@@ -37,12 +37,26 @@ Copy the whole `SteamSData` folder somewhere safe.
 1. Download **BepInEx 6 Bleeding Edge, Unity.IL2CPP-win-x64** from <https://builds.bepinex.dev/projects/bepinex_be>.
 2. Extract the zip into the game folder so `winhttp.dll` sits next to `DaveTheDiver.exe`.
 3. Launch the game once and quit at the title screen. The first launch takes a few minutes while BepInEx generates `BepInEx\interop`.
-4. Copy `VanillaPlus.dll` to `BepInEx\plugins\VanillaPlus\`.
+4. Copy `VanillaPlus.dll` (a prebuilt copy is in `dist/`) to `BepInEx\plugins\VanillaPlus\`.
 5. Launch the game. The config file appears at `BepInEx\config\vanillaplus.davethediver.cfg`.
 
 ## Install: Bazzite / Steam Deck style Linux (Proton)
 
-The game runs through Proton, so use the same **win-x64** BepInEx build and the same `VanillaPlus.dll`.
+The game runs through Proton, so it uses the same **win-x64** BepInEx build and the same `VanillaPlus.dll` as Windows.
+
+### One command
+
+In Desktop Mode, with the game closed, open a terminal (Konsole) and run:
+
+```
+curl -fsSL https://raw.githubusercontent.com/OverworkedStudent/davediver/main/install-bazzite.sh | bash
+```
+
+It finds the game in any Steam library (internal drive or SD card), installs BepInEx if it is missing and installs the latest `VanillaPlus.dll`. Run it again at any time to update. Each run also resets the plugin's settings to the current defaults; the previous settings file is kept next to it as `.bak`.
+
+Then do step 2 below once (the launch option), and start the game. The first start takes a few minutes while BepInEx generates its files.
+
+### By hand
 
 1. In Desktop Mode, extract the BepInEx zip into the game folder (Steam: right-click the game, Manage, Browse local files).
 2. In Steam, open the game's Properties and set Launch Options to:
@@ -93,7 +107,7 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | DiveMap | Opacity | 1.0 | Opacity of the map picture. Range 0.4 to 1. |
 | FishSpawn | Enabled | true | Raise the odds of chosen fish at spawn points that can already produce them, and log the real odds. |
 | FishSpawn | BoostedFish | Tuna,Marlin | Name fragments of the fish to favour. |
-| FishSpawn | Multiplier | 10 | How much heavier those fish weigh in each spawn draw. Range 1 to 100. |
+| FishSpawn | Multiplier | 3 | How much heavier those fish weigh in each spawn draw. Range 1 to 100. |
 | CrabTrap | Enabled | true | Shorten how long a placed crab trap takes. |
 | CrabTrap | Seconds | 5 | Longest a crab trap takes, in seconds. Range 1 to 600. |
 | Stealth | Enabled | true | Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him. |
@@ -116,17 +130,17 @@ The game is built around 60 FPS. The existing Nexus mod "FPS Unlocker - In the J
 Open `BepInEx/LogOutput.log` and look for lines from the `VanillaPlus` source:
 
 ```
-[Info   :VanillaPlus] VanillaPlus 0.1.0 loading
+[Info   :VanillaPlus] VanillaPlus 1.0.0 loading
 [Info   :VanillaPlus] Game version: ... (Unity 6000.0.52f1)
 [Info   :VanillaPlus] Feature Clarity: ON
 [Info   :VanillaPlus] Feature FPS unlock: OFF (TargetFPS=0)
-[Info   :VanillaPlus] Feature Harpoon struggle: ON (StruggleMultiplier=1.5)
+[Info   :VanillaPlus] Feature Harpoon struggle: ON (StruggleMultiplier=3)
 [Info   :VanillaPlus] Feature Perfect pour tip: ON (PerfectPourTipMultiplier=1.15)
 ```
 
 ## Uninstall
 
-- Plugin only: delete `BepInEx/plugins/VanillaPlus/` and `BepInEx/config/vanillaplus.davethediver.cfg`.
+- Plugin only: delete `BepInEx/plugins/VanillaPlus/`, `BepInEx/config/vanillaplus.davethediver.cfg` and the `BepInEx/VanillaPlus-logs/` folder.
 - Everything: also delete the `BepInEx` folder, `dotnet` folder, `winhttp.dll`, `doorstop_config.ini` and `.doorstop_version` from the game folder. On Bazzite, clear the launch option too.
 
 Saves are not affected either way.

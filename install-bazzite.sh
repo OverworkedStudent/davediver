@@ -50,6 +50,13 @@ mkdir -p "$game/BepInEx/plugins/VanillaPlus"
 curl -fL --progress-bar "$PLUGIN_URL" -o "$tmp/VanillaPlus.dll"
 cp -f "$tmp/VanillaPlus.dll" "$game/BepInEx/plugins/VanillaPlus/VanillaPlus.dll"
 
+# Start from the current default settings so this device matches the build. The old file is kept as .bak.
+cfg="$game/BepInEx/config/vanillaplus.davethediver.cfg"
+if [ -f "$cfg" ]; then
+  mv -f "$cfg" "$cfg.bak"
+  say "Settings reset to this build's defaults (old file kept as vanillaplus.davethediver.cfg.bak)"
+fi
+
 cat <<'EOF'
 
 == Done. One thing left that only you can do, once:

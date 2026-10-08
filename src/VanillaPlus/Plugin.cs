@@ -12,7 +12,7 @@ public class Plugin : BasePlugin
 {
     public const string Guid = "vanillaplus.davethediver";
     public const string Name = "VanillaPlus";
-    public const string Version = "0.1.0";
+    public const string Version = "1.0.0";
 
     // BepInEx prefixes every line with the source name, so all output reads "[Info   :VanillaPlus] ...".
     internal static ManualLogSource Logger;
