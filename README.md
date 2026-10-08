@@ -10,9 +10,9 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Clarity toggle (remove edge blur and darkening) | Working in game |
 | FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
 | Easier harpoon struggle | Working in game |
-| Crab trap timer | Implemented, awaiting in-game test |
+| Crab trap timer | Working in game |
 | Auto pickup | Working in game |
-| Perfect pour tip buff | Implemented, awaiting in-game test |
+| Perfect pour tip buff | Working in game |
 | Dive map | Working in game; fish dots and the controller toggle await a test |
 | Gentler stealth (glacier passage) | Implemented, awaiting in-game test |
 | Sea People Village walk speed | Working in game |
@@ -86,14 +86,14 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | DiveMap | StartMode | Off | How the map starts each session: Off, Mini or Big. |
 | DiveMap | ToggleKey | M | Keyboard key that cycles Off, Mini, Big. |
 | DiveMap | ControllerToggle | HoldRightStickClick | Controller shortcut: HoldRightStickClick (press the right stick in and hold half a second), BothStickClicks, SelectPlusRightStickClick, or None. |
-| DiveMap | ShowFish | true | Fish as dots: yellow while the species still lacks a 3-star catch, faint once it has one. |
+| DiveMap | ShowFish | false | Fish as dots: yellow while the species still lacks a 3-star catch, faint once it has one. |
 | DiveMap | MiniCorner | TopRight | Screen corner for the round map. TopRight is the corner the dive HUD leaves free. |
 | DiveMap | MiniSize | 0.2 | Diameter of the round map as a share of screen height. Range 0.12 to 0.4. |
 | DiveMap | MiniRadius | 15 | How far the round map sees around Dave, in game units. Range 8 to 40. |
 | DiveMap | Opacity | 1.0 | Opacity of the map picture. Range 0.4 to 1. |
 | FishSpawn | Enabled | true | Raise the odds of chosen fish at spawn points that can already produce them, and log the real odds. |
 | FishSpawn | BoostedFish | Tuna,Marlin | Name fragments of the fish to favour. |
-| FishSpawn | Multiplier | 3 | How much heavier those fish weigh in each spawn draw. Range 1 to 10. |
+| FishSpawn | Multiplier | 10 | How much heavier those fish weigh in each spawn draw. Range 1 to 100. |
 | CrabTrap | Enabled | true | Shorten how long a placed crab trap takes. |
 | CrabTrap | Seconds | 5 | Longest a crab trap takes, in seconds. Range 1 to 600. |
 | Balatro | Enabled | true | Speed up the card mini-game. |
