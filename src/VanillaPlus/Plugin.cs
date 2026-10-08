@@ -59,6 +59,10 @@ public class Plugin : BasePlugin
             Apply("Auto pickup", typeof(Features.AutoPickupPatch));
         if (ModConfig.PerfectPourTipEnabled.Value && ModConfig.PerfectPourTipMultiplier.Value > 1f)
             Apply("Perfect pour tip", typeof(Features.PerfectPourTipPatch));
+        if (ModConfig.FishSpawnEnabled.Value && ModConfig.FishSpawnMultiplier.Value > 1f)
+            Apply("Fish spawn odds", typeof(Features.FishSpawnPatch));
+        if (ModConfig.BalatroSpeedEnabled.Value && ModConfig.BalatroSpeedMultiplier.Value > 1f)
+            Apply("Balatro speed", typeof(Features.BalatroSpeedPatch));
         if (ModConfig.StealthEnabled.Value && ModConfig.StealthDetectionMultiplier.Value < 1f)
             Apply("Gentler stealth", typeof(Features.GentleStealthPatch));
         if (ModConfig.VillageSpeedEnabled.Value && ModConfig.VillageSpeedMultiplier.Value > 1f)

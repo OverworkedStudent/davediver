@@ -41,6 +41,13 @@ internal static class ModConfig
     public static ConfigEntry<float> DiveMapOpacity;
     public static ConfigEntry<bool> DiveMapShowFish;
 
+    public static ConfigEntry<bool> FishSpawnEnabled;
+    public static ConfigEntry<string> FishSpawnBoostedFish;
+    public static ConfigEntry<float> FishSpawnMultiplier;
+
+    public static ConfigEntry<bool> BalatroSpeedEnabled;
+    public static ConfigEntry<float> BalatroSpeedMultiplier;
+
     private static readonly Dictionary<string, ConfigEntry<bool>> clarityEffects = new();
 
     // Unknown effect types (colour grading, bloom, ...) are never touched.
@@ -93,6 +100,20 @@ internal static class ModConfig
             "Show live fish as dots: bright yellow while you still lack a 3-star catch of that species, faint once you have one.");
         DiveMapOpacity = cfg.Bind("DiveMap", "Opacity", 1f,
             new ConfigDescription("Opacity of the map picture.", new AcceptableValueRange<float>(0.4f, 1f)));
+
+        FishSpawnEnabled = cfg.Bind("FishSpawn", "Enabled", true,
+            "Raise the odds of chosen fish at spawn points that can already produce them. Also logs the real odds.");
+        FishSpawnBoostedFish = cfg.Bind("FishSpawn", "BoostedFish", "Tuna,Marlin",
+            "Comma-separated name fragments of the fish to favour, matched against the game's fish names.");
+        FishSpawnMultiplier = cfg.Bind("FishSpawn", "Multiplier", 3f,
+            new ConfigDescription("How much heavier those fish weigh in each spawn draw. 1.0 = vanilla.",
+                new AcceptableValueRange<float>(1f, 10f)));
+
+        BalatroSpeedEnabled = cfg.Bind("Balatro", "Enabled", true,
+            "Speed up the card mini-game.");
+        BalatroSpeedMultiplier = cfg.Bind("Balatro", "SpeedMultiplier", 8f,
+            new ConfigDescription("Pace multiplier for the card mini-game. 1.0 = vanilla.",
+                new AcceptableValueRange<float>(1f, 16f)));
 
         StealthEnabled = cfg.Bind("Stealth", "Enabled", true,
             "Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him.");
