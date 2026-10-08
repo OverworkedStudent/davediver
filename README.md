@@ -101,7 +101,7 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | Stealth | Enabled | true | Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him. |
 | Stealth | DetectionSpeedMultiplier | 0.7 | How fast their alert gauge fills. 1.0 = vanilla. Range 0.25 to 1. |
 | VillageSpeed | Enabled | true | Move faster in the Sea People Village only. |
-| VillageSpeed | SpeedMultiplier | 1.5 | Move speed multiplier in the village. 1.0 = vanilla. Range 1 to 3. |
+| VillageSpeed | SpeedMultiplier | 1.5 | Move speed multiplier in the village. 1.0 = vanilla. Range 1 to 6. |
 
 ### Dive map
 
