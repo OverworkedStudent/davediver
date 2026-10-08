@@ -45,6 +45,9 @@ internal static class ModConfig
     public static ConfigEntry<string> FishSpawnBoostedFish;
     public static ConfigEntry<float> FishSpawnMultiplier;
 
+    public static ConfigEntry<bool> CrabTrapEnabled;
+    public static ConfigEntry<float> CrabTrapSeconds;
+
     public static ConfigEntry<bool> BalatroSpeedEnabled;
     public static ConfigEntry<float> BalatroSpeedMultiplier;
 
@@ -108,6 +111,12 @@ internal static class ModConfig
         FishSpawnMultiplier = cfg.Bind("FishSpawn", "Multiplier", 3f,
             new ConfigDescription("How much heavier those fish weigh in each spawn draw. 1.0 = vanilla.",
                 new AcceptableValueRange<float>(1f, 10f)));
+
+        CrabTrapEnabled = cfg.Bind("CrabTrap", "Enabled", true,
+            "Shorten how long a placed crab trap takes before it can be collected.");
+        CrabTrapSeconds = cfg.Bind("CrabTrap", "Seconds", 5f,
+            new ConfigDescription("Longest a crab trap takes, in seconds. Traps that are already faster are left alone.",
+                new AcceptableValueRange<float>(1f, 600f)));
 
         BalatroSpeedEnabled = cfg.Bind("Balatro", "Enabled", true,
             "Speed up the card mini-game.");

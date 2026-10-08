@@ -9,7 +9,8 @@ A small quality-of-life plugin for Dave the Diver (Steam) built on BepInEx 6 IL2
 | Plugin skeleton, config, startup logging | Done |
 | Clarity toggle (remove edge blur and darkening) | Working in game |
 | FPS unlock | Implemented, awaiting in-game test. See the FPS warning below |
-| Easier harpoon struggle | Reworked after two failed attempts, awaiting in-game test |
+| Easier harpoon struggle | Working in game |
+| Crab trap timer | Implemented, awaiting in-game test |
 | Auto pickup | Working in game |
 | Perfect pour tip buff | Implemented, awaiting in-game test |
 | Dive map | Working in game; fish dots and the controller toggle await a test |
@@ -91,6 +92,8 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | FishSpawn | Enabled | true | Raise the odds of chosen fish at spawn points that can already produce them, and log the real odds. |
 | FishSpawn | BoostedFish | Tuna,Marlin | Name fragments of the fish to favour. |
 | FishSpawn | Multiplier | 3 | How much heavier those fish weigh in each spawn draw. Range 1 to 10. |
+| CrabTrap | Enabled | true | Shorten how long a placed crab trap takes. |
+| CrabTrap | Seconds | 5 | Longest a crab trap takes, in seconds. Range 1 to 600. |
 | Balatro | Enabled | true | Speed up the card mini-game. |
 | Balatro | SpeedMultiplier | 8 | Pace multiplier for the card mini-game. Range 1 to 16. |
 | Stealth | Enabled | true | Make the patrolling creatures in the glacier passage slower to spot Dave. They can still catch him. |
