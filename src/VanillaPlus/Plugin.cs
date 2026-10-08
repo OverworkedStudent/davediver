@@ -61,6 +61,8 @@ public class Plugin : BasePlugin
             Apply("Perfect pour tip", typeof(Features.PerfectPourTipPatch));
         if (ModConfig.FishSpawnEnabled.Value && ModConfig.FishSpawnMultiplier.Value > 1f)
             Apply("Fish spawn odds", typeof(Features.FishSpawnPatch));
+        if (ModConfig.WeaponBreakEnabled.Value && ModConfig.WeaponBreakHoldMultiplier.Value < 1f)
+            Apply("Weapon break hold time", typeof(Features.HoldTimePatch));
         if (ModConfig.CrabTrapEnabled.Value)
             Apply("Crab trap timer", typeof(Features.CrabTrapPatch));
         if (ModConfig.BalatroSpeedEnabled.Value && ModConfig.BalatroSpeedMultiplier.Value > 1f)

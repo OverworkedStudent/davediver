@@ -70,7 +70,9 @@ The game runs through Proton, so use the same **win-x64** BepInEx build and the 
 | FPS | Enabled | true | Allow the mod to change the frame cap. |
 | FPS | TargetFPS | 0 | Frame cap. 0 = vanilla, frame rate settings untouched. Any other value also turns VSync off. Range 0 to 360. |
 | HarpoonStruggle | Enabled | true | Multiply the progress each stick rock / button mash gives. Never auto-completes. |
-| HarpoonStruggle | StruggleMultiplier | 1.5 | Progress multiplier per input. 1.0 = vanilla. Range 1 to 3. |
+| HarpoonStruggle | StruggleMultiplier | 3 | Progress multiplier per input. 1.0 = vanilla. Range 1 to 6. |
+| WeaponBreak | Enabled | true | Shorten the hold needed to break down a weapon picked up during a dive. |
+| WeaponBreak | HoldTimeMultiplier | 0.5 | Hold time multiplier. 0.5 = twice as fast. Range 0.1 to 1. |
 | PerfectPourTip | Enabled | true | Slightly raise tip chance after a perfect green tea or beer pour. |
 | PerfectPourTip | PerfectPourTipMultiplier | 1.15 | Tip chance multiplier, clamped to the game's maximum. 1.0 = vanilla. Range 1 to 2. |
 | AutoPickup | Enabled | true | Master toggle: pick up nearby things while diving, as if the interact button had been pressed. |

@@ -45,6 +45,9 @@ internal static class ModConfig
     public static ConfigEntry<string> FishSpawnBoostedFish;
     public static ConfigEntry<float> FishSpawnMultiplier;
 
+    public static ConfigEntry<bool> WeaponBreakEnabled;
+    public static ConfigEntry<float> WeaponBreakHoldMultiplier;
+
     public static ConfigEntry<bool> CrabTrapEnabled;
     public static ConfigEntry<float> CrabTrapSeconds;
 
@@ -112,6 +115,12 @@ internal static class ModConfig
             new ConfigDescription("How much heavier those fish weigh in each spawn draw. 1.0 = vanilla.",
                 new AcceptableValueRange<float>(1f, 10f)));
 
+        WeaponBreakEnabled = cfg.Bind("WeaponBreak", "Enabled", true,
+            "Shorten the hold needed to break down a weapon picked up during a dive.");
+        WeaponBreakHoldMultiplier = cfg.Bind("WeaponBreak", "HoldTimeMultiplier", 0.5f,
+            new ConfigDescription("Hold time multiplier. 0.5 = twice as fast, 1.0 = vanilla.",
+                new AcceptableValueRange<float>(0.1f, 1f)));
+
         CrabTrapEnabled = cfg.Bind("CrabTrap", "Enabled", true,
             "Shorten how long a placed crab trap takes before it can be collected.");
         CrabTrapSeconds = cfg.Bind("CrabTrap", "Seconds", 5f,
@@ -134,7 +143,7 @@ internal static class ModConfig
             "Move faster in the Sea People Village. Dives are not affected.");
         VillageSpeedMultiplier = cfg.Bind("VillageSpeed", "SpeedMultiplier", 1.5f,
             new ConfigDescription("Move speed multiplier in the village. 1.0 = vanilla.",
-                new AcceptableValueRange<float>(1f, 3f)));
+                new AcceptableValueRange<float>(1f, 6f)));
 
         FpsEnabled = cfg.Bind("FPS", "Enabled", true,
             "Allow this mod to change the frame cap. Has no effect while TargetFPS is 0.");
@@ -144,9 +153,9 @@ internal static class ModConfig
 
         StruggleEnabled = cfg.Bind("HarpoonStruggle", "Enabled", true,
             "Multiply the progress each stick rock / button mash gives while landing a speared fish. Never auto-completes.");
-        StruggleMultiplier = cfg.Bind("HarpoonStruggle", "StruggleMultiplier", 1.5f,
+        StruggleMultiplier = cfg.Bind("HarpoonStruggle", "StruggleMultiplier", 3f,
             new ConfigDescription("Progress multiplier per input. 1.0 = vanilla.",
-                new AcceptableValueRange<float>(1f, 3f)));
+                new AcceptableValueRange<float>(1f, 6f)));
 
         PerfectPourTipEnabled = cfg.Bind("PerfectPourTip", "Enabled", true,
             "Slightly raise the tip chance after a perfect green tea or beer pour.");
