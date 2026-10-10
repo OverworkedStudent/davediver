@@ -12,7 +12,7 @@ public class Plugin : BasePlugin
 {
     public const string Guid = "vanillaplus.davethediver";
     public const string Name = "VanillaPlus";
-    public const string Version = "1.0.0";
+    public const string Version = "1.0.1";
 
     // BepInEx prefixes every line with the source name, so all output reads "[Info   :VanillaPlus] ...".
     internal static ManualLogSource Logger;
@@ -45,6 +45,12 @@ public class Plugin : BasePlugin
         LogFeature("Dive map", ModConfig.DiveMapEnabled.Value,
             $"start={ModConfig.DiveMapStartMode.Value}, key={ModConfig.DiveMapToggleKey.Value}, controller={ModConfig.DiveMapControllerToggleCombo.Value}, " +
             $"corner={ModConfig.DiveMapMiniCorner.Value}");
+        LogFeature("Fish spawn odds", ModConfig.FishSpawnEnabled.Value && ModConfig.FishSpawnMultiplier.Value > 1f,
+            $"fish={ModConfig.FishSpawnBoostedFish.Value}, Multiplier={ModConfig.FishSpawnMultiplier.Value:0.##}");
+        LogFeature("Weapon break hold time", ModConfig.WeaponBreakEnabled.Value && ModConfig.WeaponBreakHoldMultiplier.Value < 1f,
+            $"HoldTimeMultiplier={ModConfig.WeaponBreakHoldMultiplier.Value:0.##}");
+        LogFeature("Crab trap timer", ModConfig.CrabTrapEnabled.Value,
+            $"Seconds={ModConfig.CrabTrapSeconds.Value:0.##}");
 
         // Feature patch classes live in Features/ and are applied here, one PatchAll per enabled feature.
         if (ModConfig.ClarityEnabled.Value)
@@ -53,7 +59,8 @@ public class Plugin : BasePlugin
             Apply("FPS unlock", typeof(Features.FpsUnlockPatch));
         if (ModConfig.StruggleEnabled.Value && ModConfig.StruggleMultiplier.Value > 1f)
             Apply("Harpoon struggle", typeof(Features.HarpoonStrugglePatch));
-        if (ModConfig.AutoPickupEnabled.Value || ModConfig.DiveMapEnabled.Value)
+        if ((ModConfig.AutoPickupEnabled.Value && ModConfig.AutoPickupFish.Value) ||
+            (ModConfig.DiveMapEnabled.Value && ModConfig.DiveMapShowFish.Value))
             Apply("Fish registry", typeof(Features.FishRegistry));
         if (ModConfig.AutoPickupEnabled.Value)
             Apply("Auto pickup", typeof(Features.AutoPickupPatch));

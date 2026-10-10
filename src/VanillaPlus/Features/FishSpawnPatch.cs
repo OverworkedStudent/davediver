@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
+using UnityEngine;
 
 namespace VanillaPlus.Features;
 
@@ -16,11 +17,14 @@ namespace VanillaPlus.Features;
 internal static class FishSpawnPatch
 {
     private const int MaxLogs = 60;
+    private const float RescanInterval = 0.5f;
 
     private static readonly HashSet<int> seen = new();
     private static string[] wanted;
     private static int logs;
     private static int managerId;
+    private static int lastCount = -1;
+    private static float nextScan;
     private static int listed, fixedOnly, boosted, tooLate;
 
     [HarmonyPostfix]
@@ -48,6 +52,7 @@ internal static class FishSpawnPatch
                 Log($"FishSpawn: level summary: {listed} spawn points listing a boosted fish ({boosted} boosted in time, {tooLate} had already spawned), {fixedOnly} with one as their fixed fish");
             managerId = id;
             seen.Clear();
+            lastCount = -1;
             listed = fixedOnly = boosted = tooLate = 0;
         }
 
@@ -56,7 +61,15 @@ internal static class FishSpawnPatch
         wanted ??= ParseNames(ModConfig.FishSpawnBoostedFish.Value);
         if (wanted.Length == 0) return;
 
-        for (int i = 0; i < allocators.Count; i++)
+        // Spawn points are looked at the moment the list changes, and now and then besides. Walking the
+        // whole list every frame would be wasted work on a handheld.
+        int count = allocators.Count;
+        float now = Time.unscaledTime;
+        if (count == lastCount && now < nextScan) return;
+        lastCount = count;
+        nextScan = now + RescanInterval;
+
+        for (int i = 0; i < count; i++)
         {
             var allocator = allocators[i];
             if (allocator == null || !seen.Add(allocator.GetInstanceID())) continue;

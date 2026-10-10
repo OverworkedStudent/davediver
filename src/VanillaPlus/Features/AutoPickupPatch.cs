@@ -25,6 +25,7 @@ internal static class AutoPickupPatch
     // Picking something up can disable it at once, which edits the sets above, so loops run over copies.
     private static readonly List<PickupInstanceItem> itemBuffer = new();
     private static readonly List<InstanceItemChest> chestBuffer = new();
+    private static readonly List<FishInteractionBody> fishBuffer = new();
 
     private static bool wasLocked;
     private static float unlockTime;
@@ -124,7 +125,9 @@ internal static class AutoPickupPatch
 
     private static void PickupFish(PlayerCharacter player, Vector3 playerPos, float radius)
     {
-        foreach (var body in FishRegistry.All)
+        fishBuffer.Clear();
+        fishBuffer.AddRange(FishRegistry.All);
+        foreach (var body in fishBuffer)
         {
             if (body == null) continue;
             GameObject go = body.gameObject;

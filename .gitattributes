@@ -1,0 +1,3 @@
+# The installer is piped straight into bash on Linux, so it must never pick up Windows line endings.
+*.sh text eol=lf
+dist/*.dll binary

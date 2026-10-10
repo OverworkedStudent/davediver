@@ -23,7 +23,11 @@ internal static class SessionLog
 
             foreach (var old in new DirectoryInfo(dir).GetFiles("session-*.log")
                          .OrderByDescending(f => f.Name).Skip(SessionsToKeep - 1))
-                old.Delete();
+            {
+                // A file that cannot be removed must not cost this session its log.
+                try { old.Delete(); }
+                catch (Exception) { }
+            }
 
             writer = new StreamWriter(Path.Combine(dir, $"session-{DateTime.Now:yyyyMMdd-HHmmss}.log")) { AutoFlush = true };
             source.LogEvent += OnLog;
@@ -36,6 +40,14 @@ internal static class SessionLog
 
     private static void OnLog(object sender, LogEventArgs e)
     {
-        writer.WriteLine($"{DateTime.Now:HH:mm:ss} [{e.Level}] {e.Data}");
+        // A full disk or a lost file must never reach the feature that was only trying to log a line.
+        try
+        {
+            writer?.WriteLine($"{DateTime.Now:HH:mm:ss} [{e.Level}] {e.Data}");
+        }
+        catch (Exception)
+        {
+            writer = null;
+        }
     }
 }

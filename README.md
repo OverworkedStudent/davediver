@@ -52,9 +52,36 @@ In Desktop Mode, with the game closed, open a terminal (Konsole) and run:
 curl -fsSL https://raw.githubusercontent.com/OverworkedStudent/davediver/main/install-bazzite.sh | bash
 ```
 
-It finds the game in any Steam library (internal drive or SD card), installs BepInEx if it is missing and installs the latest `VanillaPlus.dll`. Run it again at any time to update. Each run also resets the plugin's settings to the current defaults; the previous settings file is kept next to it as `.bak`.
+It finds the game in any Steam library (internal drive or SD card), installs BepInEx if it is missing or incomplete, and installs the latest `VanillaPlus.dll`. Run it again at any time to update.
 
-Then do step 2 below once (the launch option), and start the game. The first start takes a few minutes while BepInEx generates its files.
+Then do step 2 below once (the launch option), and start the game. The first start takes a few minutes while BepInEx generates its files. The script tells you at the end whether it could already see the launch option in Steam.
+
+What the script does and does not do:
+
+- Saves are never touched.
+- Your settings are kept between updates. They are reset only when a new build changes its defaults in a way worth picking up, and then the old file stays next to the new one as `vanillaplus.davethediver.cfg.<date>.bak`. The first run of this version of the script on a device set up by an older one resets them once.
+- Each download is checked before anything is replaced, so a failed download leaves the plugin you already had in place.
+- It refuses to run while the game is open, or with `sudo`.
+
+If the game is not found (an unusual library location), point at the folder that holds `DaveTheDiver.exe`:
+
+```
+curl -fsSL https://raw.githubusercontent.com/OverworkedStudent/davediver/main/install-bazzite.sh | GAME_DIR="/path/to/Dave the Diver" bash
+```
+
+Where things are on Bazzite, inside the game folder (usually `~/.local/share/Steam/steamapps/common/Dave the Diver`):
+
+- Settings: `BepInEx/config/vanillaplus.davethediver.cfg`
+- This plugin's log, one file per session: `BepInEx/VanillaPlus-logs/`
+- Everything BepInEx logged on the last start: `BepInEx/LogOutput.log`
+
+If the mod does not seem to load:
+
+- No `BepInEx/LogOutput.log` at all means BepInEx never started: the launch option is missing or mistyped.
+- A log without any `VanillaPlus` lines means the plugin is not in `BepInEx/plugins/VanillaPlus/`: run the script again.
+- If a black console window sits in front of the game in Gaming Mode, open `BepInEx/config/BepInEx.cfg`, find `[Logging.Console]` and set `Enabled = false`.
+
+The script has been tested against a copy of a Steam library layout (fresh install, update, bad and cut-off downloads), not yet on every Bazzite setup. If it stops with an error, the message says what it was looking for.
 
 ### By hand
 
@@ -130,7 +157,7 @@ The game is built around 60 FPS. The existing Nexus mod "FPS Unlocker - In the J
 Open `BepInEx/LogOutput.log` and look for lines from the `VanillaPlus` source:
 
 ```
-[Info   :VanillaPlus] VanillaPlus 1.0.0 loading
+[Info   :VanillaPlus] VanillaPlus 1.0.1 loading
 [Info   :VanillaPlus] Game version: ... (Unity 6000.0.52f1)
 [Info   :VanillaPlus] Feature Clarity: ON
 [Info   :VanillaPlus] Feature FPS unlock: OFF (TargetFPS=0)
@@ -140,7 +167,7 @@ Open `BepInEx/LogOutput.log` and look for lines from the `VanillaPlus` source:
 
 ## Uninstall
 
-- Plugin only: delete `BepInEx/plugins/VanillaPlus/`, `BepInEx/config/vanillaplus.davethediver.cfg` and the `BepInEx/VanillaPlus-logs/` folder.
+- Plugin only: delete `BepInEx/plugins/VanillaPlus/`, `BepInEx/config/vanillaplus.davethediver.cfg` (and any `.bak` copies and `.vanillaplus-settings-rev` next to it) and the `BepInEx/VanillaPlus-logs/` folder.
 - Everything: also delete the `BepInEx` folder, `dotnet` folder, `winhttp.dll`, `doorstop_config.ini` and `.doorstop_version` from the game folder. On Bazzite, clear the launch option too.
 
 Saves are not affected either way.
